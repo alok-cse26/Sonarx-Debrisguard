@@ -1,0 +1,88 @@
+{
+  "id": "sonarx-debrisguard-v5",
+  "name": "SonarX DebrisGuard – Ocean AI & Marine Debris Detector",
+  "short_name": "SonarX",
+  "description": "Autonomous Marine Debris, Sonar Acoustic Anomaly Detection & Satellite Multi-Scale Sensing Engine by Team SonarX, Bennett University.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "window-controls-overlay"],
+  "orientation": "any",
+  "background_color": "#070b14",
+  "theme_color": "#00f0ff",
+  "categories": ["science", "education", "utilities", "productivity"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "./icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI Sonar Waterfall",
+      "short_name": "Sonar",
+      "url": "./index.html#waterfall",
+      "description": "Live acoustic sonar waterfall with edge AI detections",
+      "icons": [{ "src": "./icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Global Debris Map",
+      "short_name": "Map",
+      "url": "./index.html#map",
+      "description": "Interactive global ocean debris hotspot GIS map",
+      "icons": [{ "src": "./icons/icon-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "OceanAI Bot",
+      "short_name": "OceanAI",
+      "url": "./index.html#oceanai",
+      "description": "Multi-LLM subsea intelligence chatbot",
+      "icons": [{ "src": "./icons/icon-96.png", "sizes": "96x96" }]
+    }
+  ]
+}

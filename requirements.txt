@@ -1,0 +1,10 @@
+# SonarX DebrisGuard Dependencies
+# NOTE: The application is designed to run 100% standalone using Python 3 standard library
+# with zero external dependencies needed!
+#
+# If you wish to extend the backend with optional ML frameworks later:
+# flask>=3.0.0
+# numpy>=1.26.0
+# opencv-python>=4.9.0
+# torch>=2.2.0
+# torchvision>=0.17.0

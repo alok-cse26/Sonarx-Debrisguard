@@ -1,0 +1,94 @@
+### SonarX DebrisGuard REST API Requests
+### Use with VS Code REST Client extension, Thunder Client, or cURL
+@baseUrl = http://localhost:8080
+
+### 1. Health Check
+GET {{baseUrl}}/api/health
+
+### 2. Get Team Details (SDG Canvas)
+GET {{baseUrl}}/api/team
+
+### 3. Get Active Survey Missions
+GET {{baseUrl}}/api/missions
+
+### 4. Get Seafloor Debris Detections
+GET {{baseUrl}}/api/detections?mission_id=MSN-2026-BOB-09
+
+### 5. Get Satellite Constellation & Radar Passes
+GET {{baseUrl}}/api/satellite/constellation
+
+### 6. Compute Hydrodynamic Lagrangian Sinking Trajectory (Satellite Surface -> Seabed)
+POST {{baseUrl}}/api/satellite/drift-model
+Content-Type: application/json
+
+{
+  "surface_lat": 17.6985,
+  "surface_lng": 83.2120,
+  "current_knots": 1.4,
+  "heading_deg": 135.0,
+  "depth_m": 42.0,
+  "settling_velocity": 0.08
+}
+
+### 7. Uplink Debris Coordinates to Iridium LEO Satellite
+POST {{baseUrl}}/api/satellite/uplink
+Content-Type: application/json
+
+{
+  "id": "DET-101",
+  "satellite_id": "SAT-IRID142"
+}
+
+### 8. View Satellite Uplink Audit Logs
+GET {{baseUrl}}/api/satellite/uplinks
+
+### 9. Operator Verification (Approve for Clean-Up)
+POST {{baseUrl}}/api/detections/verify
+Content-Type: application/json
+
+{
+  "id": "DET-101",
+  "action": "APPROVE",
+  "notes": "Verified by maritime clean-up operator: high ghost net entanglement threat."
+}
+
+### 10. Operator Verification (Preserve as Artificial Habitat - Ecological Safeguard)
+POST {{baseUrl}}/api/detections/verify
+Content-Type: application/json
+
+{
+  "id": "DET-105",
+  "action": "PROTECT_HABITAT",
+  "notes": "SDG 14.1 Review: Historic wreck formed thriving coral nursery. Do not disturb."
+}
+
+### 11. Run 6-Stage AI Sonar Pipeline Simulation
+POST {{baseUrl}}/api/sonar/process
+Content-Type: application/json
+
+{
+  "mission_id": "MSN-2026-BOB-09",
+  "slant_range_corrected": true,
+  "tvg_applied": true,
+  "speckle_filter": "lee"
+}
+
+### 12. Synthesize New Acoustic Target via GAN Diffusion (Stage 4)
+POST {{baseUrl}}/api/synthetic/generate
+Content-Type: application/json
+
+{
+  "mission_id": "MSN-2026-BOB-09"
+}
+
+### 13. Live AUV Jetson Orin Hardware Telemetry
+GET {{baseUrl}}/api/telemetry
+
+### 14. Real-Time SDG 14/12/9 Environmental Metrics
+GET {{baseUrl}}/api/sdg/metrics
+
+### 15. Download Navigation GeoJSON
+GET {{baseUrl}}/api/export/geojson
+
+### 16. Download Clean-Up Manifest CSV
+GET {{baseUrl}}/api/export/csv

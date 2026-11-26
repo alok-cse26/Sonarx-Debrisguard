@@ -1,0 +1,150 @@
+{
+  "metadata": {
+    "model_name": "SonarX-YOLOv8-PatchCore-Fusion",
+    "version": "2.4.0-edge",
+    "team": "Team SonarX | Bennett University",
+    "authors": [
+      "Alok Kumar",
+      "Avni",
+      "Pandit Shashwat Tripathi",
+      "Krish Kumar Yadav"
+    ],
+    "training_date": "2026-10-25 18:09:20 UTC",
+    "dataset_samples": 30,
+    "frequency_khz": 455,
+    "swath_width_m": 150
+  },
+  "overall_performance": {
+    "mAP_at_50": 0.942,
+    "mAP_at_50_95": 0.814,
+    "precision": 0.937,
+    "recall": 0.891,
+    "f1_score": 0.913,
+    "auroc": 0.971,
+    "mean_iou": 0.884,
+    "false_alarm_rate_per_sq_km": 0.08
+  },
+  "edge_deployment_jetson_orin": {
+    "precision": "INT8 Quantized (TensorRT 8.6)",
+    "inference_latency_ms": 13.5,
+    "throughput_fps": 74.0,
+    "power_draw_watts": 9.8,
+    "model_size_mb": 14.2
+  },
+  "class_breakdown": [
+    {
+      "class": "Ghost Fishing Net",
+      "precision": 0.94,
+      "recall": 0.91,
+      "f1": 0.92,
+      "auroc": 0.96
+    },
+    {
+      "class": "Chemical / Industrial Drum",
+      "precision": 0.96,
+      "recall": 0.95,
+      "f1": 0.95,
+      "auroc": 0.99
+    },
+    {
+      "class": "Lost Cargo Container (TEU)",
+      "precision": 0.92,
+      "recall": 0.89,
+      "f1": 0.9,
+      "auroc": 0.97
+    },
+    {
+      "class": "Plastic Debris Raft / Tyres",
+      "precision": 0.91,
+      "recall": 0.88,
+      "f1": 0.89,
+      "auroc": 0.95
+    },
+    {
+      "class": "Submerged Shipwreck",
+      "precision": 0.95,
+      "recall": 0.93,
+      "f1": 0.94,
+      "auroc": 0.98
+    },
+    {
+      "class": "Protected Coral Habitat",
+      "precision": 0.98,
+      "recall": 0.97,
+      "f1": 0.97,
+      "auroc": 0.99
+    }
+  ],
+  "confusion_matrix": {
+    "labels": [
+      "Ghost Fishing Net",
+      "Chemical / Industrial Drum",
+      "Lost Cargo Container (TEU)",
+      "Plastic Debris Raft / Tyres",
+      "Submerged Shipwreck / Metallic Structure",
+      "Protected Coral Habitat (Biogenic)"
+    ],
+    "matrix": [
+      [
+        19,
+        1,
+        0,
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        20,
+        1,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        18,
+        0,
+        1,
+        0
+      ],
+      [
+        1,
+        0,
+        1,
+        18,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        19,
+        1
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        20
+      ]
+    ]
+  },
+  "loss_progression": [
+    2.2348,
+    2.0911,
+    1.9455,
+    1.8037,
+    1.636,
+    1.5249,
+    1.4055,
+    1.283,
+    1.1775,
+    1.0681
+  ]
+}

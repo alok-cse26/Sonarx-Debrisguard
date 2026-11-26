@@ -1,0 +1,153 @@
+{
+  "project": "SonarX DebrisGuard",
+  "institution": "Bennett University, Greater Noida, India",
+  "team_members": [
+    {
+      "name": "Alok Kumar",
+      "id": "S26CSEU3209",
+      "role": "Lead Architect & AI Systems"
+    },
+    {
+      "name": "Avni",
+      "id": "S26CSEU3153",
+      "role": "Signal Processing & Data Pipelines"
+    },
+    {
+      "name": "Pandit Shashwat Tripathi",
+      "id": "S26CSEU3232",
+      "role": "Acoustic DSP & Underwater Physics"
+    },
+    {
+      "name": "Krish Kumar Yadav",
+      "id": "S26CSEU3219",
+      "role": "GIS Bathymetry & Satellite Fusion"
+    }
+  ],
+  "sdg_alignments": {
+    "SDG_14": "Conserve and sustainably use oceans, seas, and marine resources (Targets 14.1, 14.2, 14.5)",
+    "SDG_12": "Ensure sustainable consumption and production patterns (Target 12.5 waste circularity)",
+    "SDG_9": "Build resilient infrastructure, foster innovation (Targets 9.1, 9.5 scientific research)"
+  },
+  "acoustic_physics_principles": [
+    {
+      "formula": "Transmission Loss (TL)",
+      "equation": "TL = 20 * log10(R) + alpha * R",
+      "variables": "R = Slant Range (meters), alpha = Seawater Acoustic Absorption Coefficient (dB/km)"
+    },
+    {
+      "formula": "Acoustic Shadow Height Calculation",
+      "equation": "h = (L_shadow * H_towfish) / R_slant",
+      "variables": "h = Physical height of object (m), L_shadow = Acoustic shadow length (m), H_towfish = Altitude above seafloor (m), R_slant = Distance to object"
+    },
+    {
+      "formula": "Speed of Sound in Seawater (Mackenzie Formula)",
+      "equation": "c = 1448.96 + 4.591*T - 0.05304*T^2 + 0.0002374*T^3 + 1.340*(S - 35) + 0.0163*D",
+      "variables": "T = Temperature (\u00b0C), S = Salinity (PSU), D = Depth (meters)"
+    },
+    {
+      "formula": "Slant-Range to Ground-Range Rectification",
+      "equation": "R_ground = sqrt(R_slant^2 - H_towfish^2)",
+      "variables": "Corrects non-linear horizontal pixel compression in raw side-scan sonograms"
+    }
+  ],
+  "monitored_ocean_basins": [
+    "Indian Ocean (Equatorial Trench)",
+    "Bay of Bengal (Continental Shelf BB-09)",
+    "Arabian Sea (Mumbai High Basin)",
+    "Pacific Garbage Patch (GPGP)",
+    "South Pacific (Point Nemo Spacecraft Cemetery)",
+    "North Atlantic (Sargasso Sea)",
+    "South Atlantic (Benguela Current)",
+    "Mediterranean Sea (Tyrrhenian Basin)",
+    "Red Sea (Bab-el-Mandeb Strait)",
+    "Arctic Ocean (Fram Strait)",
+    "Southern Ocean (Drake Passage)",
+    "South China Sea (Sunda Shelf)"
+  ],
+  "classes": [
+    {
+      "id": 0,
+      "name": "Ghost Fishing Net",
+      "material": "Polyamide / Nylon Monofilament",
+      "acoustic_signature": "Porous diffuse backscatter with extended trailing shadow",
+      "hazard_score": 0.88,
+      "sdg_impact": "Target 14.1 (Plastic & Ghost Gear Prevention)",
+      "typical_dimensions_m": [
+        8.0,
+        15.0,
+        1.2
+      ],
+      "reflection_db": -14.2
+    },
+    {
+      "id": 1,
+      "name": "Chemical / Industrial Drum",
+      "material": "Corrugated Steel / Metallic Alloy",
+      "acoustic_signature": "Sharp specular reflection peak + steep rectangular shadow",
+      "hazard_score": 0.95,
+      "sdg_impact": "Target 14.1 (Hazardous Chemical Spill Prevention)",
+      "typical_dimensions_m": [
+        0.6,
+        0.9,
+        0.9
+      ],
+      "reflection_db": 8.5
+    },
+    {
+      "id": 2,
+      "name": "Lost Cargo Container (TEU)",
+      "material": "Corten Steel / Corrugated Metal",
+      "acoustic_signature": "High-intensity linear edge return + wide rectangular shadow",
+      "hazard_score": 0.91,
+      "sdg_impact": "Target 14.2 (Navigational Hazard & Seafloor Crushing)",
+      "typical_dimensions_m": [
+        6.1,
+        2.4,
+        2.6
+      ],
+      "reflection_db": 14.1
+    },
+    {
+      "id": 3,
+      "name": "Plastic Debris Raft / Tyres",
+      "material": "HDPE / Polypropylene / Vulcanized Rubber",
+      "acoustic_signature": "Semi-diffuse mottled return with irregular boundary shadow",
+      "hazard_score": 0.79,
+      "sdg_impact": "Target 14.1 (Microplastic Ingestion Mitigation)",
+      "typical_dimensions_m": [
+        2.5,
+        4.0,
+        0.8
+      ],
+      "reflection_db": -6.8
+    },
+    {
+      "id": 4,
+      "name": "Submerged Shipwreck / Metallic Structure",
+      "material": "Iron / Timber / Heavy Composites",
+      "acoustic_signature": "Massive multi-point specular array + structural acoustic occlusions",
+      "hazard_score": 0.62,
+      "sdg_impact": "Target 14.5 (Marine Heritage & Artificial Reef Coexistence)",
+      "typical_dimensions_m": [
+        22.0,
+        8.5,
+        5.0
+      ],
+      "reflection_db": 18.0
+    },
+    {
+      "id": 5,
+      "name": "Protected Coral Habitat (Biogenic)",
+      "material": "Calcium Carbonate (Scleractinia)",
+      "acoustic_signature": "High-rugosity complex volumetric scattering without sharp geometric edges",
+      "hazard_score": 0.05,
+      "sdg_impact": "Target 14.2 (Protected Marine Habitat SAFEGUARD - DO NOT DREDGE)",
+      "typical_dimensions_m": [
+        5.0,
+        7.0,
+        1.8
+      ],
+      "reflection_db": -2.4
+    }
+  ]
+}

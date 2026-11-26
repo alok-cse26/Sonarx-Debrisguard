@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>SonarX DebrisGuard – Master Presentation Deck | Team SonarX (Bennett University)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: #0d1626;
+      --cyan: #00f0ff;
+      --blue: #0060ff;
+      --green: #00ff88;
+      --amber: #ffb703;
+      --red: #ff3366;
+      --text: #e2f1f8;
+      --muted: #7ec8e3;
+      --border: rgba(0, 240, 255, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top progress bar */
+    #progressBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--cyan), var(--blue));
+      transition: width 0.3s ease;
+      z-index: 1000;
+    }
+
+    /* Header controls */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(7, 11, 20, 0.95);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand h1 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--cyan);
+      letter-spacing: 1px;
+    }
+
+    .badge {
+      background: rgba(0, 240, 255, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--border);
+      color: var(--cyan);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: rgba(0, 240, 255, 0.25);
+      border-color: var(--cyan);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      color: #070b14;
+      border: none;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    }
+
+    /* Presentation viewport */
+    main {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .slide {
+      position: absolute;
+      width: 92%;
+      max-width: 1100px;
+      height: 84%;
+      max-height: 640px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(20px) scale(0.98);
+      transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+
+    .slide-tag {
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 6px;
+    }
+
+    .slide-title {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #ffffff;
+      line-height: 1.25;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+    }
+
+    .slide-content {
+      flex: 1;
+      overflow-y: auto;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #c8e8f0;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: rgba(0, 240, 255, 0.05);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .feature-card h3 {
+      color: var(--cyan);
+      font-size: 1.05rem;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 0.85rem;
+      color: #a0c4d8;
+    }
+
+    .stat-box {
+      background: rgba(7, 11, 20, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .speaker-notes-box {
+      margin-top: 14px;
+      background: rgba(255, 183, 3, 0.08);
+      border: 1px dashed var(--amber);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+      color: #ffe6a7;
+      display: none;
+    }
+
+    .speaker-notes-box.show {
+      display: block;
+    }
+
+    /* Footer navigation strip */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 24px;
+      background: rgba(7, 11, 20, 0.95);
+      border-top: 1px solid var(--border);
+    }
+
+    .slide-counter {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--cyan);
+    }
+
+    .key-hints {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Print styles */
+    @media print {
+      body { overflow: visible; height: auto; }
+      header, footer, #progressBar { display: none; }
+      .slide {
+        position: relative;
+        opacity: 1;
+        transform: none;
+        page-break-after: always;
+        width: 100%;
+        max-width: 100%;
+        height: auto;
+        box-shadow: none;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .slide { padding: 20px; width: 96%; height: 90%; }
+      .slide-title { font-size: 1.3rem; }
+      .key-hints { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progressBar" style="width: 7%;"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand">
+      <span style="font-size: 1.4rem;">🌊</span>
+      <h1>SonarX DebrisGuard</h1>
+      <span class="badge">DEFENSE DECK</span>
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="toggleSpeakerNotes()">
+        <span>🎙️</span> Notes (<span id="notesStatus">OFF</span>)
+      </button>
+      <button class="btn" onclick="toggleFullscreen()">
+        <span>⛶</span> Fullscreen
+      </button>
+      <button class="btn" onclick="window.print()">
+        <span>🖨️</span> Print / PDF
+      </button>
+      <a href="./index.html" class="btn btn-primary" target="_blank">
+        <span>🌐</span> Live App Demo
+      </a>
+    </div>
+  </header>
+
+  <!-- Slide Viewport -->
+  <main>
+
+    <!-- Slide 1 -->
+    <div class="slide active" data-slide="1">
+      <div>
+        <div class="slide-tag">PROJECT PRESENTATION & CAPSTONE DEFENSE</div>
+        <h2 class="slide-title">SonarX DebrisGuard</h2>
+        <div style="font-size: 1.15rem; color: var(--cyan); margin-bottom: 16px; font-weight: 600;">
+          Edge-Ready Sonar Marine Debris & Anomaly Detector with Multi-Scale Satellite Fusion
+        </div>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2" style="margin-bottom: 16px;">
+          <div class="feature-card">
+            <h3>🎓 Bennett University, Greater Noida</h3>
+            <p>School of Computer Science Engineering and Technology</p>
+            <p style="margin-top: 8px; color: var(--cyan); font-weight: bold;">Team SonarX:</p>
+            <ul style="margin: 6px 0 0 18px; font-size: 0.85rem; color: #a0c4d8;">
+              <li><strong>Alok Kumar</strong> (S26CSEU3209) — AI/ML Lead</li>
+              <li><strong>Avni</strong> (S26CSEU3153) — Backend & Data Pipelines</li>
+              <li><strong>Pandit Shashwat Tripathi</strong> (S26CSEU3232) — DSP & Acoustics</li>
+              <li><strong>Krish Kumar Yadav</strong> (S26CSEU3219) — GIS & Satellite Fusion</li>
+            </ul>
+          </div>
+          <div class="feature-card">
+            <h3>🎯 Core UN SDG Alignment</h3>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
+              <span class="badge" style="background:#0060ff22;">SDG 14: Life Below Water</span>
+              <span class="badge" style="background:#ffb70322; color:#ffb703; border-color:#ffb703;">SDG 12: Circular Economy</span>
+              <span class="badge" style="background:#00ff8822; color:#00ff88; border-color:#00ff88;">SDG 9: Industry & Innovation</span>
+              <span class="badge" style="background:#ff336622; color:#ff3366; border-color:#ff3366;">SDG 13: Climate Action</span>
+            </div>
+            <p style="margin-top: 14px; font-size: 0.82rem;">
+              Live Cloud Deployment: <a href="https://funny-guide-6kpi6.ship.place/" target="_blank" style="color:var(--cyan);">https://funny-guide-6kpi6.ship.place/</a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> Welcome evaluators and professors. We are Team SonarX from Bennett University. Today we present SonarX DebrisGuard: an autonomous, edge-deployed subsea acoustic intelligence and marine anomaly detection platform.
+      </div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide" data-slide="2">
+      <div>
+        <div class="slide-tag">THE PROBLEM</div>
+        <h2 class="slide-title">The Subsea Blindspot: Where Does Ocean Plastic Go?</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3" style="margin-bottom: 20px;">
+          <div class="stat-box">
+            <div class="stat-val" style="color: var(--red);">94%</div>
+            <div class="stat-label">Sinks Below Surface</div>
+            <p style="font-size:0.75rem; margin-top:6px; color:#a0c4d8;">Only 6% floats; the rest settles onto seafloors and shelves.</p>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color: var(--amber);">640,000 T</div>
+            <div class="stat-label">Ghost Gear Lost / Year</div>
+            <p style="font-size:0.75rem; margin-top:6px; color:#a0c4d8;">Commercial nets keep trapping marine life for decades.</p>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color: var(--cyan);">$50,000</div>
+            <div class="stat-label">Per Dredger Jam Incident</div>
+            <p style="font-size:0.75rem; margin-top:6px; color:#a0c4d8;">Dredger suction cutterheads choked by submerged tyres & nets.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <h3>The Core Operational Challenge</h3>
+          <p>Traditional cleanups focus exclusively on surface floating trash. Meanwhile, continental shelves and harbor approaches are choked with sunken synthetic nets, chemical drums, and containers that endanger shipping, damage dredging equipment, and devastate marine biodiversity.</p>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> Over 94% of plastic debris sinks to the seabed where satellites cannot see it. Ghost nets continue catching fish and turtles indefinitely, while harbor dredgers regularly suffer catastrophic $50,000 cutterhead damages.
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide" data-slide="3">
+      <div>
+        <div class="slide-tag">TECHNOLOGY BOTTLENECK</div>
+        <h2 class="slide-title">Why Optical Cameras Fail Underwater</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="feature-card" style="border-color: var(--red);">
+            <h3 style="color: var(--red);">❌ Optical ROVs & Diver Teams (Status Quo)</h3>
+            <ul style="margin: 8px 0 0 18px; font-size: 0.85rem; line-height: 1.8;">
+              <li><strong>Turbidity Barrier:</strong> River silt & monsoons reduce visibility to &lt;1.5 meters.</li>
+              <li><strong>Prohibitive Cost:</strong> Chartering survey vessels & divers costs $15,000–$25,000 / day.</li>
+              <li><strong>Minimal Swath:</strong> Covers less than 0.1 km² per day.</li>
+              <li><strong>Human Danger:</strong> High-risk decompression diving in harbor fairways.</li>
+            </ul>
+          </div>
+          <div class="feature-card" style="border-color: var(--green);">
+            <h3 style="color: var(--green);">✅ SonarX Acoustic Side-Scan (Our Solution)</h3>
+            <ul style="margin: 8px 0 0 18px; font-size: 0.85rem; line-height: 1.8;">
+              <li><strong>Zero-Visibility Penetration:</strong> 455 kHz sound waves ignore muddy silt.</li>
+              <li><strong>Expansive Coverage:</strong> 150-meter swath covers 6.5+ km² per sortie.</li>
+              <li><strong>Autonomous Electric AUV:</strong> Subsea execution for under $2,200 / day (85% cheaper).</li>
+              <li><strong>Real-Time Edge INT8:</strong> Instant target geo-tagging at 74 frames/sec.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> Optical cameras are useless in turbid coastal waters like the Bay of Bengal where visibility is under 5 feet. High-frequency side-scan sonar is the only physics-based modality that works, piercing turbid water with a 150m swath.
+      </div>
+    </div>
+
+    <!-- Slide 4 -->
+    <div class="slide" data-slide="4">
+      <div>
+        <div class="slide-tag">SYSTEM ARCHITECTURE</div>
+        <h2 class="slide-title">The 6-Stage AI & Digital Signal Processing Pipeline</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3">
+          <div class="feature-card">
+            <span class="badge">STAGE 1: DSP</span>
+            <h3 style="margin-top:6px;">Acoustic Preprocessing</h3>
+            <p>Slant-range rectification eliminates blind nadir zones; logarithmic TVG gain normalizes backscatter intensity; adaptive Lee filtering clears speckle.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">STAGE 2: SUPERVISED</span>
+            <h3 style="margin-top:6px;">YOLOv8-SSS Neural Net</h3>
+            <p>Custom-trained acoustic backbone detects ghost nets, plastic rafts, chemical drums, and tyres at <strong>94.2% mAP@0.5</strong>.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">STAGE 3: ANOMALY</span>
+            <h3 style="margin-top:6px;">PatchCore Memory Bank</h3>
+            <p>Zero-shot acoustic anomaly detection flags novel uncataloged hazards (mines, pipeline ruptures) with <strong>97.1% AUROC</strong>.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">STAGE 4: SYNTHESIS</span>
+            <h3 style="margin-top:6px;">Synthetic Augmentation</h3>
+            <p>Acoustic diffusion model provides 100× data efficiency, saving $350,000 in expensive offshore sea trials.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">STAGE 5: GIS & SATELLITE</span>
+            <h3 style="margin-top:6px;">12-Ocean Bathymetry</h3>
+            <p>Space-to-seafloor sensor fusion connects Sentinel-1 SAR surface slicks with AUV seabed targets via 3D Lagrangian drift modeling.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">STAGE 6: HITL</span>
+            <h3 style="margin-top:6px;">Human-in-the-Loop</h3>
+            <p>Grad-CAM acoustic explainability heatmaps for port hydrographers + built-in <strong>Artificial Reef Habitat Safeguard</strong>.</p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> Our 6-stage engineering pipeline rectifies acoustic physics, runs dual-branch neural classification (supervised YOLOv8 plus unsupervised PatchCore), and integrates multi-satellite drift modeling.
+      </div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide" data-slide="5">
+      <div>
+        <div class="slide-tag">BENCHMARKS</div>
+        <h2 class="slide-title">Embedded Edge Hardware & Neural Benchmarks</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-4" style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px;">
+          <div class="stat-box">
+            <div class="stat-val">13.5 ms</div>
+            <div class="stat-label">Edge Inference Latency</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">74.1 FPS</div>
+            <div class="stat-label">Inference Frame Rate</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">9.8 W</div>
+            <div class="stat-label">Jetson Power Draw</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--green);">94.2%</div>
+            <div class="stat-label">mAP@0.5 Accuracy</div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <h3>INT8 TensorRT Quantization Feat</h3>
+          <p>By quantizing 32-bit floating point weights down to calibrated 8-bit integers (INT8), model footprint was compressed by <strong>75%</strong> with only a 0.9% variance in detection accuracy. The system runs fully embedded on an Nvidia Jetson Orin Nano/NX within standard 24V AUV battery envelopes.</p>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> On an underwater vehicle, power is life. By optimizing through TensorRT INT8 quantization, we achieve 74 frames per second at 13.5 milliseconds while drawing less than 10 watts of power.
+      </div>
+    </div>
+
+    <!-- Slide 6 -->
+    <div class="slide" data-slide="6">
+      <div>
+        <div class="slide-tag">GIS & SATELLITES</div>
+        <h2 class="slide-title">Global 12-Ocean Coverage & Satellite Fusion</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="feature-card">
+            <h3>🌍 12 Major Ocean Basins in GIS</h3>
+            <p style="font-size:0.85rem; line-height: 1.6;">
+              • <strong>Indian Ocean:</strong> Abyssal containers & deep longline tangles.<br>
+              • <strong>Arabian Sea:</strong> Mumbai-Oman tanker lanes & chemical drums.<br>
+              • <strong>Bay of Bengal:</strong> Ganges fan silt & ghost trawler net rafts.<br>
+              • <strong>Pacific GPGP:</strong> Megaplastic HDPE crates & 200m ghost net balls.<br>
+              • <strong>Point Nemo:</strong> Spacecraft cemetery (Mir, ISS booster fragments).<br>
+              • <strong>Atlantic, Mediterranean, Arctic, Southern, South China, Red Sea.</strong>
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>🛰️ 3D Lagrangian Sinking Drift Physics</h3>
+            <p style="font-size:0.85rem; line-height: 1.6;">
+              • <strong>Sentinel-1 SAR Radar:</strong> Tracks surface plastic fronts day/night.<br>
+              • <strong>Sentinel-2 Optical FDI:</strong> Identifies coastal river discharge plumes.<br>
+              • <strong>Hydrodynamic Stokes Settling:</strong> Models water density, particle diameter, and current vectors to predict exact seabed landing coordinates.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> SonarX is truly global. We cover 12 ocean basins with accurate bathymetric profiles, while our 3D Lagrangian drift model predicts exactly where surface satellite slicks will settle onto the seabed.
+      </div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide" data-slide="7">
+      <div>
+        <div class="slide-tag">MARKET VALIDATION</div>
+        <h2 class="slide-title">Empirical Field Survey: 185 Maritime Stakeholders</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3" style="margin-bottom: 16px;">
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--cyan);">92.4%</div>
+            <div class="stat-label">Confirm Debris Crisis</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--amber);">86.5%</div>
+            <div class="stat-label">Incurred Financial Damage</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" style="color:var(--green);">+77.3</div>
+            <div class="stat-label">Net Promoter Score</div>
+          </div>
+        </div>
+        <div class="feature-card">
+          <h3>The #1 Consensus Feature: Ecological Habitat Safeguard (97.8% Agreement)</h3>
+          <p>Both commercial fishers and marine scientists overwhelmingly demanded that cleanup AI systems must <strong>distinguish between harmful ghost nets and beneficial colonized artificial reefs</strong>. SonarX is the only platform with built-in habitat protection.</p>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> We surveyed 185 professionals across ports, fishing guilds, and naval units. Over 86% experienced direct financial losses. 97.8% demanded our ecological safeguard to prevent accidental destruction of fish breeding reefs.
+      </div>
+    </div>
+
+    <!-- Slide 8 -->
+    <div class="slide" data-slide="8">
+      <div>
+        <div class="slide-tag">COMMERCIAL MODEL</div>
+        <h2 class="slide-title">Business Model Canvas & Unit Economics</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3" style="margin-bottom: 16px;">
+          <div class="feature-card">
+            <h3>🏛️ Tier 1: Port DaaS</h3>
+            <div style="font-size:1.2rem; font-weight:bold; color:var(--cyan);">$45k–$120k / yr</div>
+            <p style="font-size:0.8rem; margin-top:4px;">Annual recurring fairways inspection & regulatory compliance license.</p>
+          </div>
+          <div class="feature-card">
+            <h3>⚡ Tier 2: Pipeline IaaS</h3>
+            <div style="font-size:1.2rem; font-weight:bold; color:var(--amber);">$350–$650 / NM</div>
+            <p style="font-size:0.8rem; margin-top:4px;">Per-nautical-mile obstacle & UXO audit for offshore wind and oil operators.</p>
+          </div>
+          <div class="feature-card">
+            <h3>♻️ Tier 3: Salvage Bounty</h3>
+            <div style="font-size:1.2rem; font-weight:bold; color:var(--green);">15% Referral</div>
+            <p style="font-size:0.8rem; margin-top:4px;">Commission on reclaimed commercial scrap metals and recycled nylon yarn.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <h3>Unit Economics & Breakeven</h3>
+          <p>Autonomous survey operational cost: <strong>$2,200/day</strong> vs. <strong>$15,000/day</strong> for manned dive tugs (85% savings). Projected Year 2 Revenue: <strong>$1.38 Million</strong> with <strong>72.4% Gross Margin</strong> and breakeven achieved at Month 14.</p>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> Our unit economics deliver an 85% cost reduction to port authorities. We operate a predictable DaaS subscription model that achieves operational breakeven by month 14 with a 72% gross margin.
+      </div>
+    </div>
+
+    <!-- Slide 9 -->
+    <div class="slide" data-slide="9">
+      <div>
+        <div class="slide-tag">SDG IMPACT</div>
+        <h2 class="slide-title">Quantified Environmental & Decarbonization Accounting</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="feature-card">
+            <h3 style="color:var(--cyan);">🌊 SDG 14: Life Below Water</h3>
+            <p style="font-size:0.85rem; line-height:1.7;">
+              • <strong>820 kg</strong> of ghost gear & toxic plastics targeted per 10 km² survey.<br>
+              • <strong>100% preservation</strong> of colonized artificial coral skiff nurseries.<br>
+              • Elimination of ghost fishing cycles in critical coastal breeding grounds.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3 style="color:var(--green);">🌿 SDG 12 & 13: Circularity & Climate</h3>
+            <p style="font-size:0.85rem; line-height:1.7;">
+              • <strong>438 Liters</strong> of vessel diesel saved per 150m swath survey.<br>
+              • <strong>1,170 kg CO₂</strong> avoided per survey by deploying battery-electric AUVs.<br>
+              • Reclaimed high-grade polyamide monofilament nets recycled into textiles.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> SonarX quantitatively impacts UN SDGs. We remove 820kg of debris per mission, protect vital fish nurseries, and prevent 1.1 metric tons of carbon emissions by replacing diesel survey vessels.
+      </div>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide" data-slide="10">
+      <div>
+        <div class="slide-tag">LIVE CAPABILITIES</div>
+        <h2 class="slide-title">Interactive Experience: PWA & OceanAI Assistant</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2">
+          <div class="feature-card">
+            <h3>📱 PWA for iOS & Android</h3>
+            <p style="font-size:0.85rem; line-height:1.7;">
+              • <strong>1-Click Install:</strong> Standalone web app on iPhone Safari & Android Chrome.<br>
+              • <strong>Offline Caching:</strong> Pre-cached service worker runs with zero connectivity.<br>
+              • <strong>Mobile Touch:</strong> Touch-scrollable tabs and pinch-zoomable GIS.
+            </p>
+          </div>
+          <div class="feature-card">
+            <h3>🤖 OceanAI Conversational Bot</h3>
+            <p style="font-size:0.85rem; line-height:1.7;">
+              • <strong>Natural Language Understanding:</strong> Zero-API-key client-side NLP.<br>
+              • <strong>Instant Marine Guidance:</strong> Explains sonar physics, debris types & team info.<br>
+              • <strong>Interactive Inspector Mode:</strong> Click any button to see the math behind it!
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> Our app is live on Cloudflare right now. Anyone can install it as a PWA on their phone, chat with OceanAI, and click any button in Inspect Mode to see the exact acoustic physics formulas.
+      </div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide" data-slide="11">
+      <div>
+        <div class="slide-tag">ROADMAP</div>
+        <h2 class="slide-title">Execution Roadmap: 2026 – 2028</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-3">
+          <div class="feature-card">
+            <span class="badge">PHASE 1 (ACHIEVED)</span>
+            <h3 style="margin-top:6px;">Edge AI & GIS Workstation</h3>
+            <p>INT8 TensorRT model, 12-ocean GIS, mobile PWA, 185-person validation survey, live 24/7 deployment.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">PHASE 2 (Q2 2027)</span>
+            <h3 style="margin-top:6px;">Harbor Sea Trials</h3>
+            <p>In-water trials in Visakhapatnam Port with autonomous surface-underwater tandem AUVs.</p>
+          </div>
+          <div class="feature-card">
+            <span class="badge">PHASE 3 (2028)</span>
+            <h3 style="margin-top:6px;">Commercial Fleet Rollout</h3>
+            <p>Commercial DaaS subscriptions with Indian Major Ports; Synthetic Aperture Sonar (SAS) integration.</p>
+          </div>
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> We have completed Phase 1. Next year we begin in-water trials at Visakhapatnam Port, followed by commercial rollout to Indian and international harbor trusts by 2028.
+      </div>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide" data-slide="12">
+      <div>
+        <div class="slide-tag">SUMMARY & Q&A</div>
+        <h2 class="slide-title">Safeguarding the Ocean with Autonomous Edge AI</h2>
+      </div>
+      <div class="slide-content">
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="feature-card">
+            <h3>🎓 Team SonarX — Bennett University</h3>
+            <p style="font-size:0.85rem; line-height:1.7;">
+              • Alok Kumar (S26CSEU3209)<br>
+              • Avni (S26CSEU3153)<br>
+              • Pandit Shashwat Tripathi (S26CSEU3232)<br>
+              • Krish Kumar Yadav (S26CSEU3219)
+            </p>
+          </div>
+          <div class="feature-card" style="text-align:center;">
+            <h3>🌐 Live System Access & PWA</h3>
+            <div style="background:#ffffff; padding:8px; border-radius:12px; width:140px; height:140px; margin:8px auto; box-shadow:0 0 15px rgba(0,240,255,0.35);">
+              <img src="./icons/qrcode.png" alt="Scan QR Code" style="width:100%; height:100%; object-fit:contain; border-radius:6px;">
+            </div>
+            <a href="https://funny-guide-6kpi6.ship.place/" target="_blank" style="font-size:0.95rem; font-weight:bold; color:var(--cyan); word-break:break-all;">
+              https://funny-guide-6kpi6.ship.place/
+            </a>
+            <p style="font-size:0.75rem; color:var(--muted); margin-top:6px;">
+              Point camera to open live app & PWA on iOS / Android / Desktop
+            </p>
+          </div>
+        </div>
+        <div style="text-align:center; padding:12px; color:var(--cyan); font-weight:700; font-size:1.1rem;">
+          Thank You! We Welcome Your Questions. 🌊
+        </div>
+      </div>
+      <div class="speaker-notes-box">
+        🎙️ <strong>Speaker Notes:</strong> In summary, SonarX DebrisGuard shows how AI and acoustic engineering can protect our ocean depths. We invite you to test our live deployment on your phones right now. Thank you!
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Navigation -->
+  <footer>
+    <div class="slide-counter">
+      SLIDE <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+    <div class="key-hints">
+      Use <strong>← / →</strong> or <strong>Spacebar</strong> to navigate &bull; Press <strong>'F'</strong> for Fullscreen &bull; <strong>'S'</strong> for Speaker Notes
+    </div>
+    <div class="controls">
+      <button class="btn" onclick="prevSlide()">◀ Prev</button>
+      <button class="btn btn-primary" onclick="nextSlide()">Next ▶</button>
+    </div>
+  </footer>
+
+  <script>
+    let current = 1;
+    const slides = document.querySelectorAll('.slide');
+    const total = slides.length;
+    let showNotes = false;
+
+    document.getElementById('totalSlides').textContent = total;
+
+    function updateSlide(n) {
+      if (n < 1) n = 1;
+      if (n > total) n = total;
+      current = n;
+
+      slides.forEach((s, idx) => {
+        s.classList.toggle('active', idx + 1 === current);
+      });
+
+      document.getElementById('currentSlide').textContent = current;
+      document.getElementById('progressBar').style.width = ((current / total) * 100) + '%';
+    }
+
+    function nextSlide() { updateSlide(current + 1); }
+    function prevSlide() { updateSlide(current - 1); }
+
+    function toggleSpeakerNotes() {
+      showNotes = !showNotes;
+      document.querySelectorAll('.speaker-notes-box').forEach(box => {
+        box.classList.toggle('show', showNotes);
+      });
+      document.getElementById('notesStatus').textContent = showNotes ? 'ON' : 'OFF';
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      } else if (e.key.toLowerCase() === 's') {
+        toggleSpeakerNotes();
+      }
+    });
+
+    // Touch Swipe navigation for mobile/iPad
+    let touchStartX = 0;
+    window.addEventListener('touchstart', e => touchStartX = e.changedTouches[0].screenX, { passive: true });
+    window.addEventListener('touchend', e => {
+      let touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) nextSlide();
+      if (touchEndX - touchStartX > 50) prevSlide();
+    }, { passive: true });
+  </script>
+</body>
+</html>

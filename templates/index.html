@@ -1,0 +1,1338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <title>SonarX DebrisGuard – Edge-Ready Sonar Debris & Anomaly Detector | Team SonarX</title>
+  
+  <!-- Favicon & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet GIS Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- SonarX Theme CSS -->
+  <link rel="stylesheet" href="./css/style.css">
+
+  <!-- Modern PWA, Android & iOS Mobile Tags -->
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#070b14">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SonarX">
+  <meta name="application-name" content="SonarX">
+  <meta name="msapplication-TileColor" content="#070b14">
+  <link rel="apple-touch-icon" sizes="192x192" href="./icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="./icons/icon-512.png">
+  <link rel="icon" type="image/svg+xml" href="./icons/icon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+
+  <!-- Service Worker Registration with Auto-Update & Self-Healing -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          reg.update();
+        }).catch(err => {
+          console.warn('[SonarX SW] Registration notice:', err);
+        });
+      });
+    }
+  </script>
+</head>
+<body>
+
+  <!-- Top Navigation & Status Strip -->
+  <header class="sonar-header">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"></path>
+            <path d="M12 6a6 6 0 1 0 6 6 6 6 0 0 0-6-6zm0 8a2 2 0 1 1 2-2 2 2 0 0 1-2 2z"></path>
+            <line x1="12" y1="2" x2="12" y2="4"></line>
+            <line x1="12" y1="20" x2="12" y2="22"></line>
+            <line x1="20" y1="12" x2="22" y2="12"></line>
+            <line x1="2" y1="12" x2="4" y2="12"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>
+            <span class="gradient">SonarX DebrisGuard</span>
+            <span class="badge-edge">AUV EDGE INT8</span>
+          </h1>
+          <div class="brand-sub">
+            Edge-Ready Sonar Debris & Anomaly Detector &bull; <span class="team-badge" data-explain="sdg-canvas">Team SonarX | Bennett University</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs (Touch-Scrollable Pills) -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn active" data-tab="tab-waterfall">
+          <span>🛰️</span> Sonar Waterfall & AI
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-satellite">
+          <span>🌐</span> Satellite & Drift
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-map">
+          <span>🗺️</span> Debris Hotspot Map
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-operator">
+          <span>👁️</span> Operator Console
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-telemetry">
+          <span>⚡</span> Edge Telemetry
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-synthetic">
+          <span>🔬</span> Synthetic Lab
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-sdg">
+          <span>📜</span> SDG Canvas & Team
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-reports">
+          <span>📦</span> Dispatch & Reports
+        </button>
+        <button class="nav-tab-btn" data-tab="tab-analytics" data-explain="ml-analytics">
+          <span>🤖</span> AI Analytics & NLP
+        </button>
+      </nav>
+
+      <!-- Quick Status & Explainer Action Strip -->
+      <div class="header-actions">
+        <a href="./presentation.html" target="_blank" class="btn-sonar-secondary" style="padding:6px 12px; font-size:0.75rem; min-height:36px; text-decoration:none; display:inline-flex; align-items:center; gap:4px; border-color:var(--sonar-amber); color:var(--sonar-amber);">
+          <span>📊</span> PPT Pitch Deck
+        </a>
+        <button id="btnShareQr" class="btn-sonar-primary" style="padding:6px 12px; font-size:0.75rem; min-height:36px; background:linear-gradient(135deg, #00f0ff 0%, #00b4d8 100%); color:#070b14; font-weight:700;" onclick="window.app.showQrShareModal()">
+          <span>📲</span> Share & QR App
+        </button>
+        <button id="btnInstallPwa" class="btn-sonar-primary" style="padding:6px 12px; font-size:0.75rem; min-height:36px; background:linear-gradient(135deg, #00f0ff 0%, #0060ff 100%); color:#070b14; font-weight:700;" onclick="window.app.promptPwaInstall()">
+          <span>📱</span> Install App
+        </button>
+        <button class="btn-sonar-primary" style="padding:6px 12px; font-size:0.75rem; min-height:36px;" onclick="window.inspector.startGuidedTour()">
+          <span>🎓</span> How It Works
+        </button>
+        <button id="btnToggleInspectorMode" class="btn-sonar-secondary" style="padding:6px 12px; font-size:0.75rem; min-height:36px;" onclick="window.inspector.toggleInspectorMode()">
+          <span>🔍</span> Inspect Mode
+        </button>
+        <button id="btnToggleAudio" class="btn-sonar-secondary" style="padding:6px 10px; font-size:0.75rem; min-height:36px;" onclick="window.app.audioFX.toggleMute()">
+          <span>🔇</span> Sound: OFF
+        </button>
+        <div class="mission-selector">
+          <select id="missionSelect" title="Active Survey Track">
+            <option value="MSN-2026-BOB-09">Track BB-09 (Bay of Bengal Shelf)</option>
+          </select>
+        </div>
+        <div class="telemetry-pill" data-explain="jetson-orin">
+          <span class="status-dot"></span>
+          <span id="headerEdgeStatus">JETSON INT8 &bull; 74 FPS</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Workstation Body -->
+  <main class="sonar-main">
+
+    <!-- Interactive System Explainer Banner -->
+    <div class="explain-banner">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.4rem;">💡</span>
+        <div>
+          <strong style="color:var(--sonar-cyan); font-size:0.85rem;">Self-Explanatory Oceanic Workstation:</strong>
+          <span style="font-size:0.8rem; color:var(--text-muted);">
+            Click on any metric card, button, slider, or dial <code>(ℹ️)</code> to learn <strong>What It Is</strong> and <strong>How It Works</strong> under the hood!
+          </span>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn-sonar-primary" style="padding:6px 14px; font-size:0.75rem; min-height:34px;" onclick="window.inspector.startGuidedTour()">
+          <span>▶</span> Start 6-Step Tour
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards Bar (SDG 14, 12, 9 Real-Time Counters) -->
+    <div class="stat-kpi-grid">
+      <!-- KPI 1 -->
+      <div class="kpi-card" data-explain="kpi-plastics">
+        <div class="kpi-card-header">
+          <div class="kpi-title">Plastics & Nets Located</div>
+          <span class="info-badge" title="Click to see what this is and how it works">ℹ️</span>
+        </div>
+        <div class="kpi-value" id="metricPlasticsKg">820 kg</div>
+        <div class="kpi-sub">Targeted for Removal &bull; SDG 14.1</div>
+      </div>
+
+      <!-- KPI 2 -->
+      <div class="kpi-card" data-explain="kpi-area">
+        <div class="kpi-card-header">
+          <div class="kpi-title">Benthic Area Surveyed</div>
+          <span class="info-badge" title="Click to see what this is and how it works">ℹ️</span>
+        </div>
+        <div class="kpi-value" id="metricAreaKm2">6.53 km²</div>
+        <div class="kpi-sub">150m Swath &bull; SSS 455 kHz</div>
+      </div>
+
+      <!-- KPI 3 -->
+      <div class="kpi-card" data-explain="kpi-fps">
+        <div class="kpi-card-header">
+          <div class="kpi-title">Edge Inference Speed</div>
+          <span class="info-badge" title="Click to see what this is and how it works">ℹ️</span>
+        </div>
+        <div class="kpi-value" id="metricEdgeFps" style="color:var(--sonar-cyan);">74 FPS</div>
+        <div class="kpi-sub">Nvidia Jetson INT8 &bull; 13.5 ms</div>
+      </div>
+
+      <!-- KPI 4 -->
+      <div class="kpi-card" data-explain="ecological-reef">
+        <div class="kpi-card-header">
+          <div class="kpi-title">Artificial Reefs Preserved</div>
+          <span class="info-badge" title="Click to see what this is and how it works">ℹ️</span>
+        </div>
+        <div class="kpi-value" id="metricReefsPreserved" style="color:var(--sonar-green);">1 Site</div>
+        <div class="kpi-sub">Ecological Protection &bull; SDG 14.2</div>
+      </div>
+
+      <!-- KPI 5 -->
+      <div class="kpi-card" data-explain="kpi-co2">
+        <div class="kpi-card-header">
+          <div class="kpi-title">Vessel Diesel Saved</div>
+          <span class="info-badge" title="Click to see what this is and how it works">ℹ️</span>
+        </div>
+        <div class="kpi-value" id="metricDieselSaved" style="color:var(--sonar-amber);">438 L</div>
+        <div class="kpi-sub">1,170 kg CO₂ Avoided &bull; SDG 12.5</div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: LIVE SONAR WATERFALL & 6-STAGE AI PIPELINE -->
+    <!-- ===================================================================== -->
+    <div id="tab-waterfall" class="tab-pane active">
+      <!-- 6-Stage AI Pipeline Stepper Header -->
+      <div class="pipeline-steps-grid">
+        <div class="pipeline-step active" id="step-card-1" data-explain="slant-range">
+          <div style="font-size:0.68rem; color:var(--sonar-cyan); font-family:var(--font-mono); font-weight:bold;">STAGE 1</div>
+          <div style="font-weight:bold; color:#fff; margin:2px 0;">Preprocessing</div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">Slant-range rectification, TVG gain & speckle filtering.</div>
+        </div>
+        <div class="pipeline-step" id="step-card-2" data-explain="yolov8-detect">
+          <div style="font-size:0.68rem; color:var(--sonar-cyan); font-family:var(--font-mono); font-weight:bold;">STAGE 2</div>
+          <div style="font-weight:bold; color:#fff; margin:2px 0;">Supervised Detection</div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">YOLOv8-SSS locates nets, tyres, plastics & drums.</div>
+        </div>
+        <div class="pipeline-step" id="step-card-3" data-explain="patchcore-anomaly">
+          <div style="font-size:0.68rem; color:var(--sonar-cyan); font-family:var(--font-mono); font-weight:bold;">STAGE 3</div>
+          <div style="font-weight:bold; color:#fff; margin:2px 0;">Anomaly Detection</div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">PatchCore memory bank flags unclassified UXO & breaks.</div>
+        </div>
+        <div class="pipeline-step" id="step-card-4" data-explain="synthetic-sonar">
+          <div style="font-size:0.68rem; color:var(--sonar-cyan); font-family:var(--font-mono); font-weight:bold;">STAGE 4</div>
+          <div style="font-weight:bold; color:#fff; margin:2px 0;">Data Efficiency</div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">Procedural & diffusion synthetic acoustic augmentation.</div>
+        </div>
+        <div class="pipeline-step" id="step-card-5" data-explain="map-mission-sim">
+          <div style="font-size:0.68rem; color:var(--sonar-cyan); font-family:var(--font-mono); font-weight:bold;">STAGE 5</div>
+          <div style="font-weight:bold; color:#fff; margin:2px 0;">Geo-Referencing</div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">Acoustic layback corrected to WGS84 GPS coordinates.</div>
+        </div>
+        <div class="pipeline-step" id="step-card-6" data-explain="ecological-reef">
+          <div style="font-size:0.68rem; color:var(--sonar-cyan); font-family:var(--font-mono); font-weight:bold;">STAGE 6</div>
+          <div style="font-weight:bold; color:#fff; margin:2px 0;">Human Verification</div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">Grad-CAM explanation & eco-habitat safeguard review.</div>
+        </div>
+      </div>
+
+      <!-- Main Sonar Waterfall Canvas + Target List -->
+      <div class="grid-cols-12">
+        <!-- Waterfall Display (Col 8) -->
+        <div class="col-span-8">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>🌊 Side-Scan Sonar Acoustic Waterfall Display (Port & Starboard 150m Swath)</span>
+              </div>
+              <button class="btn-sonar-primary" id="btnRunPipeline">
+                <span>⚡</span> Run 6-Stage AI Pipeline
+              </button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="waterfall-canvas-container">
+              <canvas id="sonarCanvas"></canvas>
+              
+              <!-- Heads-Up Display Overlay -->
+              <div class="waterfall-overlay-hud">
+                <div>SWATH: <b>150m (75m Port / 75m Stbd)</b></div>
+                <div>ALTITUDE (h): <b>8.5m</b></div>
+                <div>CHANNEL: <b id="hudChannel">STARBOARD</b></div>
+                <div>GROUND RANGE: <b id="hudGroundRange">0.0 m</b></div>
+                <div>SLANT RANGE: <b id="hudSlantRange">8.5 m</b></div>
+              </div>
+
+              <!-- Nadir Mark -->
+              <div class="nadir-indicator"></div>
+              <div class="nadir-label">NADIR / AUV TRACK</div>
+            </div>
+
+            <!-- Physical Controls Strip -->
+            <div class="sonar-controls-strip">
+              <div class="control-group" data-explain="slant-range">
+                <span class="control-label">
+                  Slant-Range Correction:
+                  <span class="info-badge">ℹ️</span>
+                </span>
+                <label class="switch-toggle">
+                  <input type="checkbox" id="toggleSlantRange" checked>
+                  <span class="slider-round"></span>
+                </label>
+              </div>
+
+              <div class="control-group" data-explain="tvg">
+                <span class="control-label">
+                  TVG Normalization:
+                  <span class="info-badge">ℹ️</span>
+                </span>
+                <label class="switch-toggle">
+                  <input type="checkbox" id="toggleTVG" checked>
+                  <span class="slider-round"></span>
+                </label>
+              </div>
+
+              <div class="control-group" data-explain="speckle-filter">
+                <span class="control-label">
+                  Speckle Filter:
+                  <span class="info-badge">ℹ️</span>
+                </span>
+                <select id="selectSpeckleFilter" style="background:#070b14; color:#00f0ff; border:1px solid rgba(0,240,255,0.3); border-radius:4px; padding:4px 8px; font-size:0.75rem;">
+                  <option value="lee">Adaptive Lee Filter</option>
+                  <option value="none">Raw Speckle</option>
+                </select>
+              </div>
+
+              <div class="control-group">
+                <span class="control-label">Acoustic Palette:</span>
+                <select id="selectPalette" style="background:#070b14; color:#00f0ff; border:1px solid rgba(0,240,255,0.3); border-radius:4px; padding:4px 8px; font-size:0.75rem;">
+                  <option value="copper">Acoustic Copper (Standard)</option>
+                  <option value="emerald">Phosphor Emerald</option>
+                  <option value="monochrome">Grayscale Waterfall</option>
+                  <option value="magma">Magma Abyss</option>
+                </select>
+              </div>
+
+              <div class="control-group" data-explain="acoustic-shadow">
+                <span class="control-label">
+                  Towfish Alt (h): <b id="hudAltitudeVal" style="color:#00f0ff;">8.5m</b>
+                  <span class="info-badge">ℹ️</span>
+                </span>
+                <input type="range" id="sliderAltitude" min="3" max="22" step="0.5" value="8.5" style="width:85px; accent-color:#00f0ff;" oninput="window.app.sonarEngine.setAltitude(this.value)">
+              </div>
+
+              <div class="control-group" data-explain="yolov8-detect">
+                <span class="control-label">
+                  YOLO BBoxes:
+                  <span class="info-badge">ℹ️</span>
+                </span>
+                <label class="switch-toggle">
+                  <input type="checkbox" id="toggleBBoxes" checked>
+                  <span class="slider-round"></span>
+                </label>
+              </div>
+
+              <div class="control-group" data-explain="gradcam-heat">
+                <span class="control-label">
+                  Grad-CAM Heatmap:
+                  <span class="info-badge">ℹ️</span>
+                </span>
+                <label class="switch-toggle">
+                  <input type="checkbox" id="toggleGradCAM">
+                  <span class="slider-round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detected Targets Feed (Col 4) -->
+        <div class="col-span-4">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>🎯 Flagged Seabed Targets</span>
+              </div>
+              <span class="card-badge" id="badgeTargetCount">6 DETECTIONS</span>
+            </div>
+
+            <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">
+              Click any target below to open high-resolution acoustic shadow geometry and the <b>Ecological Review Safeguard</b>:
+            </p>
+
+            <div id="targetListContainer" style="display:flex; flex-direction:column; gap:8px; max-height:480px; overflow-y:auto; padding-right:4px;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: GEOSPATIAL DEBRIS HOTSPOT MAP (STAGE 5) -->
+    <!-- ===================================================================== -->
+    <div id="tab-map" class="tab-pane">
+      <div class="grid-cols-12">
+        <div class="col-span-12">
+          <div class="sonar-card" id="debrisMapCard">
+            <div class="card-header">
+              <div class="card-title">
+                <span id="debrisMapTitle">🗺️ Bathymetric Seafloor GIS & Debris Hotspot Map</span>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                <!-- Global Ocean Region Selector -->
+                <div style="display:flex; align-items:center; gap:6px; background:rgba(0,240,255,0.12); padding:4px 10px; border-radius:6px; border:1px solid rgba(0,240,255,0.4);" data-explain="global-oceans">
+                  <span style="font-size:0.9rem;">🌊</span>
+                  <label for="oceanRegionSelect" style="font-size:0.75rem; font-weight:bold; color:var(--sonar-cyan); margin:0;">OCEAN:</label>
+                  <select id="oceanRegionSelect" style="background:#070b14; color:#00f0ff; border:1px solid rgba(0,240,255,0.4); border-radius:4px; padding:4px 8px; font-size:0.75rem; font-weight:bold; outline:none; cursor:pointer;" onchange="window.app.debrisMap.switchOceanRegion(this.value)">
+                    <option value="Bay of Bengal">Bay of Bengal (Shelf BB-09 & Swatch of No Ground)</option>
+                    <option value="Indian Ocean">Indian Ocean (Equatorial Basin & Chagos Trench)</option>
+                    <option value="Arabian Sea">Arabian Sea (Mumbai High & Gulf of Oman)</option>
+                    <option value="Pacific Garbage Patch">Pacific Ocean (Great Garbage Patch GPGP)</option>
+                    <option value="South Pacific">South Pacific (Point Nemo Spacecraft Cemetery)</option>
+                    <option value="North Atlantic">North Atlantic (Sargasso Sea & Grand Banks)</option>
+                    <option value="South Atlantic">South Atlantic (Benguela & Rio Grande Basin)</option>
+                    <option value="Mediterranean Sea">Mediterranean Sea (Tyrrhenian & Ionian Basins)</option>
+                    <option value="Arctic Ocean">Arctic Ocean (Barents Sea & Svalbard Ice Shelf)</option>
+                    <option value="Southern Ocean">Southern Ocean (Antarctic Drake Passage)</option>
+                    <option value="South China Sea">South China Sea (Coral Triangle Transit Lanes)</option>
+                    <option value="Red Sea">Red Sea (Bab-el-Mandeb & Gulf of Suez)</option>
+                  </select>
+                </div>
+                <button id="btnSimulateMission" class="btn-sonar-primary" data-explain="map-mission-sim" onclick="window.app.debrisMap.toggleMissionSimulation()">
+                  <span>▶</span> Run AUV Mission
+                </button>
+                <button id="btnAddDebrisTarget" class="btn-sonar-secondary" data-explain="map-add-pin" onclick="window.app.debrisMap.activateAddTargetMode()">
+                  <span>➕</span> Mark Hotspot
+                </button>
+                <button id="btnToggleMapFullscreen" class="btn-sonar-secondary" onclick="window.app.debrisMap.toggleFullscreen()">
+                  <span>⛶</span> Fullscreen
+                </button>
+                <button class="btn-sonar-secondary map-layer-btn active" data-layer="dark" onclick="window.app.debrisMap.switchBasemap('dark')">
+                  <span>🌑</span> Dark Ocean
+                </button>
+                <button class="btn-sonar-secondary map-layer-btn" data-layer="satellite" onclick="window.app.debrisMap.switchBasemap('satellite')">
+                  <span>🛰️</span> Satellite MSI
+                </button>
+                <button class="btn-sonar-secondary map-layer-btn" data-layer="nautical" onclick="window.app.debrisMap.switchBasemap('nautical')">
+                  <span>🗺️</span> Nautical Topo
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.debrisMap.recenterTrack()">
+                  <span>🎯</span> Re-Center
+                </button>
+                <button class="btn-sonar-secondary" style="border-color:var(--sonar-amber); color:var(--sonar-amber);" data-explain="vessel-routing" onclick="window.app.planVesselRoute()">
+                  <span>🚢</span> Plan Route
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.exportGeoJSON()">
+                  <span>📥</span> GeoJSON
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.exportCSV()">
+                  <span>📊</span> CSV
+                </button>
+              </div>
+            </div>
+
+            <!-- Filter Pills & Coordinates Strip -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px; background:#070b14; padding:8px 12px; border-radius:6px; border:1px solid var(--border-subtle);">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn-sonar-secondary map-filter-btn active" data-filter="ALL" onclick="window.app.debrisMap.setFilter('ALL')">
+                  All Targets (6)
+                </button>
+                <button class="btn-sonar-secondary map-filter-btn" data-filter="NETS" onclick="window.app.debrisMap.setFilter('NETS')">
+                  <span style="color:#ff3366;">●</span> Ghost Nets
+                </button>
+                <button class="btn-sonar-secondary map-filter-btn" data-filter="TYRES" onclick="window.app.debrisMap.setFilter('TYRES')">
+                  <span style="color:#ffb703;">●</span> Tyres & Plastics
+                </button>
+                <button class="btn-sonar-secondary map-filter-btn" data-filter="ANOMALY" onclick="window.app.debrisMap.setFilter('ANOMALY')">
+                  <span style="color:#00f0ff;">●</span> Pipeline / UXO
+                </button>
+                <button class="btn-sonar-secondary map-filter-btn" data-filter="HABITAT" onclick="window.app.debrisMap.setFilter('HABITAT')">
+                  <span style="color:#00ff88;">●</span> Artificial Reefs
+                </button>
+              </div>
+
+              <!-- Live HUD Coordinates & Real-Time Bathymetric Sounder -->
+              <div class="map-hud-bar" data-explain="sounder-hud" style="margin:0; padding:4px 10px; border-color:rgba(0,240,255,0.3); cursor:pointer;">
+                <span>LAT: <b id="mapHudLat" style="color:#00f0ff;">17.68750°N</b></span>
+                <span>LNG: <b id="mapHudLng" style="color:#00f0ff;">83.21950°E</b></span>
+                <span>DEPTH: <b id="mapHudDepth" style="color:#ffb703;">42.5 m</b></span>
+                <span>SUBSTRATE: <b id="mapHudSubstrate" style="color:#00ff88;">Pelagic Mud & Silt</b></span>
+                <span>BACKSCATTER: <b id="mapHudBackscatter" style="color:#ff70a6;">-21.4 dB</b></span>
+                <span class="info-badge" title="Click to understand how acoustic sounding works">ℹ️</span>
+              </div>
+            </div>
+
+            <!-- Map View Container with Interactive Overlay Legend -->
+            <div style="position:relative; width:100%; border-radius:6px; overflow:hidden;">
+              <div id="debrisMap"></div>
+
+              <!-- Hotspot Heatmap Legend Badge -->
+              <div style="position:absolute; bottom:16px; left:16px; z-index:1000; background:rgba(7,11,20,0.88); backdrop-filter:blur(8px); padding:8px 12px; border-radius:6px; border:1px solid var(--border-glow); font-family:var(--font-mono); font-size:0.72rem;">
+                <div style="color:var(--sonar-cyan); font-weight:bold; margin-bottom:4px;">HYDROGRAPHIC BATHYMETRY & DEBRIS HOTSPOTS</div>
+                <div style="display:flex; gap:12px; color:var(--text-muted); flex-wrap:wrap;">
+                  <span>🔴 Critical Net Hazard</span>
+                  <span>🟡 Debris Cluster</span>
+                  <span>🔵 Subsea Anomaly</span>
+                  <span>🟢 Protected Reef Nursery</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Clean-up Vessel Route Result Box -->
+            <div id="vesselRouteDisplay" style="margin-top:12px; background:#070b14; border:1px solid var(--border-glow); border-radius:6px; padding:12px; font-family:var(--font-mono); font-size:0.75rem; line-height:1.5;">
+              <span style="color:var(--text-muted);">Click <b>"Plan Route"</b> above to calculate the optimal recovery vessel navigation trajectory from Visakhapatnam port.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: OPERATOR VERIFICATION CONSOLE -->
+    <!-- ===================================================================== -->
+    <div id="tab-operator" class="tab-pane">
+      <div class="grid-cols-12">
+        <div class="col-span-12">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>👁️ Human-in-the-Loop Operator Verification Console</span>
+              </div>
+              <span class="card-badge" data-explain="ecological-reef" style="background:rgba(255,183,3,0.15); color:var(--sonar-amber); border-color:var(--sonar-amber); cursor:pointer;">
+                SDG 14.1 ECOLOGICAL HABITAT SAFEGUARD ACTIVE ℹ️
+              </span>
+            </div>
+
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
+              As established in Section 3 & 4 of the SDG Canvas: <i>"Not all debris is harmful: old wrecks and tyres can become artificial habitat. Careless removal based on detections alone could destroy that habitat, so removal decisions need ecological review."</i>
+            </p>
+
+            <!-- Table of Detections -->
+            <div style="overflow-x:auto;">
+              <table style="width:100%; border-collapse:collapse; text-align:left;">
+                <thead>
+                  <tr style="border-bottom:1px solid var(--sonar-cyan); font-family:var(--font-mono); font-size:0.75rem; color:var(--sonar-cyan);">
+                    <th style="padding:10px;">ID</th>
+                    <th style="padding:10px;">TARGET TYPE</th>
+                    <th style="padding:10px;">AI CATEGORY</th>
+                    <th style="padding:10px;">CONFIDENCE</th>
+                    <th style="padding:10px;">GPS LOCATION</th>
+                    <th style="padding:10px;">VERIFICATION STATUS</th>
+                    <th style="padding:10px;">ACTIONS</th>
+                  </tr>
+                </thead>
+                <tbody id="operatorTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 4: EDGE TELEMETRY & SUSTAINABILITY DASHBOARD -->
+    <!-- ===================================================================== -->
+    <div id="tab-telemetry" class="tab-pane">
+      <div class="grid-cols-12">
+        <!-- Live Chart (Col 8) -->
+        <div class="col-span-8">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>⚡ Live Edge AI Hardware Inference & Latency Telemetry</span>
+              </div>
+              <span class="card-badge" data-explain="jetson-orin" style="cursor:pointer;">NVIDIA JETSON ORIN NANO INT8 ℹ️</span>
+            </div>
+
+            <div style="width:100%; height:260px; background:#070b14; border-radius:6px; border:1px solid var(--border-subtle); padding:10px;">
+              <canvas id="telemetryChart" width="800" height="240" style="width:100%; height:100%;"></canvas>
+            </div>
+
+            <!-- Hardware Mode Switcher -->
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-top:14px; background:var(--bg-surface); padding:10px; border-radius:6px;">
+              <span style="font-size:0.78rem; color:var(--text-muted);">Simulate Edge Deployment Profile:</span>
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn-sonar-secondary active" onclick="window.app.switchHardwareProfile('jetson_orin')">
+                  Jetson Orin Nano (INT8)
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.switchHardwareProfile('xavier_nx')">
+                  Xavier NX (FP16)
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.switchHardwareProfile('rpi5')">
+                  Raspberry Pi 5 (CPU)
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.switchHardwareProfile('cloud_gpu')">
+                  Cloud A100 Baseline
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry KPIs (Col 4) -->
+        <div class="col-span-4">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>📊 Sustainability & Efficiency</span>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; font-family:var(--font-mono); font-size:0.8rem;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">Frame Rate (FPS):</span>
+                <b id="edgeFpsVal" style="color:var(--sonar-cyan);">74 FPS</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">Inference Latency:</span>
+                <b id="edgeLatencyVal" style="color:#ffffff;">13.5 ms</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">Power Draw:</span>
+                <b id="edgePowerVal" style="color:var(--sonar-green);">9.8 W</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">AUV Battery Level:</span>
+                <b id="edgeBatteryVal" style="color:var(--sonar-amber);">87%</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">mAP@0.50 Precision:</span>
+                <b id="edgeMapVal" style="color:var(--sonar-cyan);">94.6%</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">False Alarms / km²:</span>
+                <b id="edgeFalseAlarmVal" style="color:#ffffff;">0.08 / km²</b>
+              </div>
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:6px;">
+                <span style="color:var(--text-muted);">Ship Diesel Saved:</span>
+                <b id="edgeFuelSavedVal" style="color:var(--sonar-green);">438 L</b>
+              </div>
+              <div style="display:flex; justify-content:space-between;">
+                <span style="color:var(--text-muted);">CO₂ Emissions Avoided:</span>
+                <b id="edgeCo2SavedVal" style="color:var(--sonar-amber);">1,170 kg</b>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 5: SYNTHETIC LAB -->
+    <!-- ===================================================================== -->
+    <div id="tab-synthetic" class="tab-pane">
+      <div class="grid-cols-12">
+        <div class="col-span-8">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>🔬 GAN & Diffusion Procedural Sonar Synthesis Lab</span>
+              </div>
+              <button class="btn-sonar-primary" onclick="window.app.sonarEngine.generateSyntheticFrame()">
+                <span>⚡</span> Generate Synthetic Waterfall Frame
+              </button>
+            </div>
+
+            <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:12px;">
+              Physical acoustic backscatter model combining Lambert's law, ray-tracing shadow projection, and speckle noise augmentation to expand scarce marine training datasets without expensive ship sea trials (SDG 9.5).
+            </p>
+
+            <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:14px; background:#070b14; padding:12px; border-radius:6px;">
+              <div>
+                <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px;">Seafloor Substrate:</label>
+                <select id="synthSubstrate" style="width:100%; background:var(--bg-surface); color:#fff; border:1px solid var(--border-subtle); padding:6px; border-radius:4px; font-size:0.75rem;">
+                  <option value="sand">Rippled Marine Sand</option>
+                  <option value="mud">Pelagic Fine Mud</option>
+                  <option value="rock">Basalt Bedrock Outcrop</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px;">Injected Target Type:</label>
+                <select id="synthTarget" style="width:100%; background:var(--bg-surface); color:#fff; border:1px solid var(--border-subtle); padding:6px; border-radius:4px; font-size:0.75rem;">
+                  <option value="net">Ghost Trawler Net</option>
+                  <option value="drum">Toxic Chemical Drum</option>
+                  <option value="uxo">Unexploded Ordnance (UXO)</option>
+                  <option value="tyres">Discarded Heavy Tyres</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:0.72rem; color:var(--text-muted); display:block; margin-bottom:4px;">Speckle Noise Level:</label>
+                <select id="synthNoise" style="width:100%; background:var(--bg-surface); color:#fff; border:1px solid var(--border-subtle); padding:6px; border-radius:4px; font-size:0.75rem;">
+                  <option value="moderate">Moderate Speckle (Sea State 3)</option>
+                  <option value="heavy">Turbid Storm (Sea State 5)</option>
+                  <option value="clean">Calm Shelf (Sea State 1)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-4">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>📚 Data Efficiency Metrics</span>
+              </div>
+            </div>
+            <div style="font-size:0.8rem; line-height:1.6; color:var(--text-muted);">
+              <p><b>Real Sonar Scans:</b> 120 validated frames</p>
+              <p><b>Synthetic Augmentations:</b> 12,000 synthetic frames</p>
+              <p><b>Data Amplification:</b> <span style="color:var(--sonar-cyan); font-weight:bold;">100x Data Efficiency</span></p>
+              <p><b>Cost Savings:</b> ~$350,000 in charter ship sea-trials saved</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 6: SDG CANVAS & TEAM SONARX -->
+    <!-- ===================================================================== -->
+    <div id="tab-sdg" class="tab-pane">
+      <div style="background:rgba(11, 19, 41, 0.7); border:1px solid var(--border-glow); border-radius:var(--radius-md); padding:20px; margin-bottom:18px;">
+        <div style="font-size:0.75rem; font-family:var(--font-mono); color:var(--sonar-amber); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px;">
+          BENNETT UNIVERSITY &bull; SDG–TECHNOLOGY MAPPING CANVAS
+        </div>
+        <h2 style="font-size:1.45rem; font-weight:800; color:#ffffff; margin-bottom:6px;">
+          Team SonarX: <span style="color:var(--sonar-cyan);">SonarX DebrisGuard</span>
+        </h2>
+        <p style="font-size:0.85rem; color:var(--text-muted); max-width:1100px;">
+          <b>Technology/Service:</b> AI-Powered Underwater Marine-Debris & Anomaly Detection Using Side-Scan Sonar Imagery.
+        </p>
+
+        <!-- Team Members Grid -->
+        <div class="team-members-grid" id="teamMembersGrid">
+          <!-- Populated from TEAM_INFO -->
+        </div>
+      </div>
+
+      <!-- SDG Canvas Detailed Mapping Cards -->
+      <div class="grid-cols-12">
+        <div class="col-span-6">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">1. Technology Snapshot & SDG Connection</div>
+            </div>
+            <div style="font-size:0.82rem; line-height:1.6; color:var(--text-muted);">
+              <p style="margin-bottom:10px;">
+                <b style="color:#ffffff;">Problem:</b> The seabed is the final resting place of a large share of marine litter – lost and abandoned fishing gear (ghost nets), plastics, tyres, metal drums, cables and wreckage. Satellites cannot see it, and cameras fail in deep, dark or turbid water.
+              </p>
+              <p style="margin-bottom:10px;">
+                <b style="color:#ffffff;">What our technology solves:</b> AI models automatically detect and classify marine debris in SSS imagery, and an anomaly-detection layer flags unusual or previously unseen objects. Raw sonar scans become geo-referenced debris and hazard maps that guide targeted clean-up.
+              </p>
+              <div style="border-top:1px solid var(--border-subtle); padding-top:10px; margin-top:10px;">
+                <div style="color:var(--sonar-cyan); font-weight:bold; margin-bottom:4px;">Strongest SDG Connection: SDG 14 (Life Below Water)</div>
+                Target 14.1 asks for preventing and significantly reducing marine pollution, including marine debris. Debris that cannot be located cannot be removed.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-span-6">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">3 & 4. Impact Detective & Fix The Technology</div>
+            </div>
+            <div style="font-size:0.82rem; line-height:1.5; color:var(--text-muted);">
+              <div style="margin-bottom:8px;">
+                <b style="color:var(--sonar-green);">🟢 Positive Impact:</b> Faster, consistent seabed screening (minutes instead of weeks). Low-cost SSS + edge AI makes monitoring affordable for smaller agencies.
+              </div>
+              <div style="margin-bottom:8px;">
+                <b style="color:var(--sonar-red);">🔴 Negative Impact:</b> Energy and carbon footprint of training heavy deep-learning models, plus fuel burned by survey vessels.
+              </div>
+              <div style="margin-bottom:12px;">
+                <b style="color:var(--sonar-amber);">🟡 Unexpected Impact:</b> Not all debris is harmful: old wrecks, tyres and hard objects can become artificial habitat. Careless removal based on detections alone could destroy that habitat!
+              </div>
+
+              <div style="background:rgba(0,240,255,0.06); border:1px solid var(--border-glow); padding:10px; border-radius:6px; margin-top:8px;">
+                <b style="color:var(--sonar-cyan);">💡 One-Line Verdict:</b>
+                <i>"Our technology contributes to cleaner oceans and safer, better-monitored seabeds (SDG 14), but its sustainability challenge is the energy cost of deep-learning models and false detections caused by noisy sonar and limited labelled data. We propose a lightweight, edge-deployable, human-in-the-loop detector that combines supervised detection with anomaly detection, transfer learning and explainable outputs."</i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive SDG Environmental Impact Simulator -->
+      <div class="sonar-card" style="margin-top:18px; border-color:var(--sonar-green);">
+        <div class="card-header">
+          <div class="card-title" style="color:var(--sonar-green);">
+            <span>🌱 Interactive Marine Ecosystem Impact Simulator (SDG 14.1 & 12.5)</span>
+          </div>
+          <span class="card-badge" style="color:var(--sonar-green); border-color:var(--sonar-green);">DYNAMIC CALCULATOR</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:14px;">
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span>Coastline Surveyed & Cleared:</span>
+              <b id="sdgValKm" style="color:#00f0ff;">25 km</b>
+            </label>
+            <input type="range" id="sdgSliderKm" min="5" max="150" value="25" style="width:100%; accent-color:#00f0ff;" oninput="window.app.updateSDGCalculator()">
+          </div>
+          <div>
+            <label style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span>Ghost Fishing Nets Retrieved:</span>
+              <b id="sdgValNets" style="color:#ff3366;">12 Nets</b>
+            </label>
+            <input type="range" id="sdgSliderNets" min="1" max="80" value="12" style="width:100%; accent-color:#ff3366;" oninput="window.app.updateSDGCalculator()">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; background:#070b14; padding:14px; border-radius:6px; font-family:var(--font-mono); font-size:0.8rem;">
+          <div>
+            <div style="color:var(--text-muted); font-size:0.7rem;">Plastics Prevented:</div>
+            <div id="calcPlasticsKg" style="color:var(--sonar-cyan); font-size:1.15rem; font-weight:bold;">1,965 kg</div>
+          </div>
+          <div>
+            <div style="color:var(--text-muted); font-size:0.7rem;">CO₂ Emissions Saved:</div>
+            <div id="calcCo2Kg" style="color:var(--sonar-green); font-size:1.15rem; font-weight:bold;">3,640 kg</div>
+          </div>
+          <div>
+            <div style="color:var(--text-muted); font-size:0.7rem;">Marine Wildlife Protected:</div>
+            <div id="calcTurtles" style="color:var(--sonar-amber); font-size:1.15rem; font-weight:bold;">22 Marine Turtles</div>
+          </div>
+          <div>
+            <div style="color:var(--text-muted); font-size:0.7rem;">Fisheries Economy Safeguarded:</div>
+            <div id="calcCommunitySavings" style="color:#ffffff; font-size:1.15rem; font-weight:bold;">₹10,200</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 7: SATELLITE & LAGRANGIAN DRIFT -->
+    <!-- ===================================================================== -->
+    <div id="tab-satellite" class="tab-pane">
+      <div class="sat-cards-grid" id="satelliteCardsContainer">
+        <!-- Populated from satellite_tracker.js -->
+      </div>
+
+      <div class="grid-cols-12">
+        <!-- Earth Observation Radar Sweep Canvas (Col 7) -->
+        <div class="col-span-7">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>🛰️ Space-Borne Synthetic Aperture Radar (SAR) & Surface Slick Sweep</span>
+              </div>
+              <span class="card-badge" style="color:var(--sonar-cyan); border-color:var(--sonar-cyan);">SENTINEL-1C C-BAND 5.405 GHz</span>
+            </div>
+
+            <div style="width:100%; height:320px; background:#070b14; border-radius:6px; border:1px solid var(--border-subtle); position:relative; overflow:hidden;">
+              <canvas id="satelliteOrbitCanvas" width="600" height="320" style="width:100%; height:100%;"></canvas>
+            </div>
+
+            <div style="margin-top:10px; font-size:0.76rem; color:var(--text-muted); line-height:1.5;">
+              <b style="color:#ffffff;">Multi-Scale Sensor Fusion:</b> Space satellites provide macro-scale wide-area surface detection of debris rafts; AUV Side-Scan Sonar provides high-resolution micro-scale bathymetric imaging on the seafloor.
+            </div>
+          </div>
+        </div>
+
+        <!-- Hydrodynamic Lagrangian 3D Sinking & Drift Simulator (Col 5) -->
+        <div class="col-span-5">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>🌊 3D Hydrodynamic Lagrangian Sinking Model</span>
+              </div>
+              <span class="card-badge" data-explain="lagrangian-drift" style="color:var(--sonar-amber); border-color:var(--sonar-amber); cursor:pointer;">EULER-LAGRANGIAN ℹ️</span>
+            </div>
+
+            <p style="font-size:0.76rem; color:var(--text-muted); margin-bottom:10px;">
+              Predicts where surface plastic slicks will sink and settle on the seafloor based on CMEMS ocean currents, Stokes drift, and plastic bio-fouling density settling velocity:
+            </p>
+
+            <div class="drift-inputs-grid">
+              <div class="drift-input-group">
+                <label>Current (m/s):</label>
+                <input type="number" id="driftCurrentSpeed" value="0.45" step="0.05">
+              </div>
+              <div class="drift-input-group">
+                <label>Current Bearing (°):</label>
+                <input type="number" id="driftCurrentBearing" value="142" step="5">
+              </div>
+              <div class="drift-input-group">
+                <label>Wind Drift (%):</label>
+                <input type="number" id="driftWindCoeff" value="2.8" step="0.1">
+              </div>
+              <div class="drift-input-group">
+                <label>Plastic Density (kg/m³):</label>
+                <input type="number" id="driftPlasticDensity" value="1035" step="5">
+              </div>
+            </div>
+
+            <button class="btn-sonar-primary" style="width:100%; margin-top:12px; justify-content:center;" onclick="window.satelliteTracker.runLagrangianDriftModel()">
+              <span>📐</span> Compute Seabed Interception Waypoint
+            </button>
+
+            <!-- Drift Results Output Box -->
+            <div id="driftResultBox" style="margin-top:12px; background:#070b14; border:1px solid var(--border-glow); border-radius:6px; padding:10px; font-family:var(--font-mono); font-size:0.75rem; line-height:1.5;">
+              <span style="color:var(--text-muted);">Adjust parameters and click <b>Compute Seabed Interception Waypoint</b> above.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Satellite Telemetry Uplink Logs -->
+      <div class="sonar-card" style="margin-top:18px;">
+        <div class="card-header">
+          <div class="card-title">
+            <span>📡 Iridium-NEXT LEO Satellite Uplink & Telemetry Logs</span>
+          </div>
+          <button class="btn-sonar-primary" style="padding:6px 12px; font-size:0.74rem;" onclick="window.satelliteTracker.simulateSatelliteUplink()">
+            <span>🛰️</span> Transmit Test Uplink Burst
+          </button>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table style="width:100%; border-collapse:collapse; text-align:left; font-family:var(--font-mono); font-size:0.75rem;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--sonar-cyan); color:var(--sonar-cyan);">
+                <th style="padding:8px;">PACKET ID</th>
+                <th style="padding:8px;">TIMESTAMP</th>
+                <th style="padding:8px;">UPLINK VEHICLE</th>
+                <th style="padding:8px;">PAYLOAD TYPE</th>
+                <th style="padding:8px;">GPS COORDINATES</th>
+                <th style="padding:8px;">SATELLITE GATEWAY</th>
+                <th style="padding:8px;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="uplinkTableBody">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 8: DISPATCH & REPORTS -->
+    <!-- ===================================================================== -->
+    <div id="tab-reports" class="tab-pane">
+      <div class="grid-cols-12">
+        <div class="col-span-12">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>📦 Clean-Up Dispatch Manifest & GeoJSON / CSV Export</span>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="btn-sonar-primary" onclick="window.app.exportGeoJSON()">
+                  <span>📥</span> Download GeoJSON
+                </button>
+                <button class="btn-sonar-secondary" onclick="window.app.exportCSV()">
+                  <span>📊</span> Download CSV Catalog
+                </button>
+              </div>
+            </div>
+
+            <!-- QR Code Mobile App Download & Share Card -->
+            <div style="background:rgba(0,240,255,0.06); border:1px solid rgba(0,240,255,0.35); border-radius:10px; padding:18px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+              <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+                <div style="background:#ffffff; padding:6px; border-radius:10px; width:110px; height:110px; min-width:110px; box-shadow:0 0 16px rgba(0,240,255,0.4); display:flex; align-items:center; justify-content:center;">
+                  <img src="./icons/qrcode.png" alt="Scan to download SonarX" style="width:100%; height:100%; object-fit:contain; border-radius:6px;" />
+                </div>
+                <div>
+                  <div style="font-size:1.05rem; font-weight:700; color:#00f0ff; margin-bottom:4px; display:flex; align-items:center; gap:8px;">
+                    <span>📱</span> Scan to Open & Install App on Mobile (PWA & Offline ZIP)
+                  </div>
+                  <div style="font-size:0.82rem; color:#d4edf4; max-width:550px; line-height:1.5;">
+                    Point any smartphone camera (iPhone / Android) at this QR code to instantly launch the live app and install it to your home screen with 1 tap. Works 100% offline with zero store requirements!
+                  </div>
+                  <div style="margin-top:6px; font-family:monospace; color:var(--sonar-amber); font-size:0.8rem;">
+                    URL: https://funny-guide-6kpi6.ship.place/
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn-sonar-primary" style="padding:8px 14px; font-size:0.8rem;" onclick="window.app.showQrShareModal()">
+                  <span>🔍</span> Enlarge QR
+                </button>
+                <a href="./sonarx-debrisguard-COMPLETE.zip" download class="btn-sonar-secondary" style="padding:8px 14px; font-size:0.8rem; text-decoration:none; display:inline-flex; align-items:center; gap:6px; border-color:var(--sonar-amber); color:var(--sonar-amber);">
+                  <span>⬇️</span> Download ZIP
+                </a>
+              </div>
+            </div>
+
+            <!-- Capstone Evaluation & Project Deliverables Suite -->
+            <div style="background:rgba(0,240,255,0.04); border:1px solid rgba(0,240,255,0.25); border-radius:6px; padding:14px; margin-bottom:18px;">
+              <div style="font-size:0.85rem; font-weight:700; color:var(--sonar-cyan); margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                <span>📁</span> Project Deliverables & Academic Capstone Suite
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+                <a href="./presentation.html" target="_blank" style="background:#070b14; border:1px solid var(--border-glow); border-radius:6px; padding:10px; text-decoration:none; display:flex; align-items:center; gap:10px; transition:all 0.2s;">
+                  <span style="font-size:1.4rem;">📽️</span>
+                  <div>
+                    <div style="color:#ffffff; font-weight:bold; font-size:0.8rem;">Presentation Deck (PPT)</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">12-Slide Defense Slide Deck</div>
+                  </div>
+                </a>
+                <div style="background:#070b14; border:1px solid var(--border-subtle); border-radius:6px; padding:10px; display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:1.4rem;">🧩</span>
+                  <div>
+                    <div style="color:#ffffff; font-weight:bold; font-size:0.8rem;">Business Model Canvas (BMC)</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">9-Block Commercial Strategy</div>
+                  </div>
+                </div>
+                <div style="background:#070b14; border:1px solid var(--border-subtle); border-radius:6px; padding:10px; display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:1.4rem;">👥</span>
+                  <div>
+                    <div style="color:#ffffff; font-weight:bold; font-size:0.8rem;">Stakeholder Analysis</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">Mendelow & RACI Matrix</div>
+                  </div>
+                </div>
+                <div style="background:#070b14; border:1px solid var(--border-subtle); border-radius:6px; padding:10px; display:flex; align-items:center; gap:10px;">
+                  <span style="font-size:1.4rem;">📋</span>
+                  <div>
+                    <div style="color:#ffffff; font-weight:bold; font-size:0.8rem;">Market Survey (N=185)</div>
+                    <div style="color:var(--text-muted); font-size:0.7rem;">Empirical Field Validation & NPS</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Official Report Layout -->
+            <div style="background:#070b14; border:1px solid var(--border-glow); border-radius:6px; padding:18px; font-family:var(--font-mono); font-size:0.8rem; line-height:1.6;">
+              <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border-subtle); padding-bottom:10px; margin-bottom:14px;">
+                <div>
+                  <div style="color:var(--sonar-cyan); font-weight:bold; font-size:0.95rem;">SONARX HYDROGRAPHIC MISSION REPORT</div>
+                  <div style="color:var(--text-muted); font-size:0.75rem;">BENNETT UNIVERSITY &bull; TEAM SONARX</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="color:var(--sonar-green); font-weight:bold;">SDG 14.1 COMPLIANT</div>
+                  <div style="color:var(--text-muted); font-size:0.75rem;">Generated: 2026-10-25</div>
+                </div>
+              </div>
+
+              <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:16px;">
+                <div>
+                  <div style="color:var(--text-muted);">SURVEY REGION:</div>
+                  <div style="color:#ffffff; font-weight:bold;">Bay of Bengal Shelf (Track BB-09)</div>
+                </div>
+                <div>
+                  <div style="color:var(--text-muted);">SWATH WIDTH & DEPTH:</div>
+                  <div style="color:#ffffff; font-weight:bold;">150m Swath | 42.5m Depth</div>
+                </div>
+                <div>
+                  <div style="color:var(--text-muted);">AUV PLATFORM:</div>
+                  <div style="color:#ffffff; font-weight:bold;">DeepScan-IV (Jetson Orin INT8)</div>
+                </div>
+              </div>
+
+              <div style="margin-top:16px;">
+                <div style="color:var(--sonar-amber); font-weight:bold; margin-bottom:6px;">CLEAN-UP PRIORITY TARGETS DISPATCHED:</div>
+                <div style="color:#f0f4f8;">
+                  1. <b>DET-101 (Ghost Net)</b>: 17.6892°N, 83.2215°E | Depth: 41.2m | Area: ~35m² | Priority: IMMEDIATE (Entanglement Hazard)<br>
+                  2. <b>DET-102 (Tyre Cluster)</b>: 17.6845°N, 83.2160°E | Depth: 43.8m | Est Weight: 320kg | Priority: SCHEDULED DISPOSAL<br>
+                  3. <b>DET-103 (Chemical Metal Drum)</b>: 17.6910°N, 83.2240°E | Depth: 44.5m | Height: 0.95m | Priority: HAZMAT HAZARD<br>
+                  4. <b>DET-104 (Pipeline Anomaly)</b>: 17.6821°N, 83.2132°E | Depth: 42.0m | PatchCore Conf: 94.1% | Priority: OFFSHORE REPAIR
+                </div>
+              </div>
+
+              <div style="margin-top:16px; border-top:1px dashed var(--border-subtle); padding-top:12px;">
+                <div style="color:var(--sonar-green); font-weight:bold; margin-bottom:4px;">ECOLOGICAL HABITAT EXCLUSION ZONE:</div>
+                <div style="color:var(--text-muted);">
+                  • <b>DET-105 (Historic Wreckage)</b>: 17.6935°N, 83.2270°E &bull; Preserved as artificial reef nursery. Retrieval prohibited under SDG 14 ecological protection policy.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 9: AI & ML ANALYTICS, DATA SCIENCE & MARINE NLP -->
+    <!-- ===================================================================== -->
+    <div id="tab-analytics" class="tab-pane">
+      <!-- Section Header -->
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+        <div>
+          <h2 style="font-size:1.15rem; font-weight:700; color:var(--sonar-cyan); margin:0; display:flex; align-items:center; gap:8px;">
+            <span>🤖</span> AI, Machine Learning, Data Science & Marine NLP
+            <span class="badge-edge" style="font-size:0.65rem;">EDGE TENSORRT INT8</span>
+          </h2>
+          <p style="color:var(--text-muted); font-size:0.75rem; margin:2px 0 0 0;">
+            Real-time acoustic neural telemetry, model evaluation, and transformer NLP query parsing
+          </p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-sonar-secondary" onclick="window.mlAnalytics && window.mlAnalytics.refresh()">
+            <span>🔄</span> Refresh Charts
+          </button>
+          <button class="btn-sonar-primary" data-explain="ml-analytics" onclick="window.inspector.explain('ml-analytics')">
+            <span>ℹ️</span> Explain AI Architecture
+          </button>
+        </div>
+      </div>
+
+      <!-- Real-Time AI Metrics Strip -->
+      <div class="stat-kpi-grid" style="margin-bottom:14px;">
+        <div class="kpi-card" data-explain="jetson-orin">
+          <div class="kpi-card-header">
+            <div class="kpi-title">Inference Latency</div>
+            <span class="info-badge">ℹ️</span>
+          </div>
+          <div class="kpi-value" id="mlInferenceTime" style="color:var(--sonar-cyan);">13.5 ms</div>
+          <div class="kpi-sub">Jetson Orin &bull; 74.1 FPS (INT8)</div>
+        </div>
+
+        <div class="kpi-card" data-explain="kpi-plastics">
+          <div class="kpi-card-header">
+            <div class="kpi-title">Cataloged Debris Targets</div>
+            <span class="info-badge">ℹ️</span>
+          </div>
+          <div class="kpi-value" id="mlObjectsDetected" style="color:var(--sonar-amber);">4,521</div>
+          <div class="kpi-sub">Across 6 Global Ocean Basins</div>
+        </div>
+
+        <div class="kpi-card" data-explain="yolov8-detect">
+          <div class="kpi-card-header">
+            <div class="kpi-title">Model Confidence (mAP)</div>
+            <span class="info-badge">ℹ️</span>
+          </div>
+          <div class="kpi-value" id="mlConfidence" style="color:var(--sonar-green);">94.2%</div>
+          <div class="kpi-sub">IoU Threshold: 0.50 &bull; AUROC: 97.1%</div>
+        </div>
+
+        <div class="kpi-card" data-explain="auv-platform">
+          <div class="kpi-card-header">
+            <div class="kpi-title">Autonomous Sorties</div>
+            <span class="info-badge">ℹ️</span>
+          </div>
+          <div class="kpi-value" id="mlMissionsRun" style="color:#ffffff;">127</div>
+          <div class="kpi-sub">AUV DeepScan-IV Missions</div>
+        </div>
+      </div>
+
+      <!-- 2x2 AI Visualizations Grid -->
+      <div class="grid-cols-12" style="margin-bottom:14px;">
+        <!-- Card 1: Model Performance -->
+        <div class="col-span-6">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>📊 Neural Network Evaluation (YOLOv8-SSS + PatchCore)</span>
+              </div>
+              <span class="info-badge" data-explain="yolov8-detect">ℹ️</span>
+            </div>
+            <div style="width:100%; overflow-x:auto;">
+              <canvas id="mlModelCanvas" width="500" height="280" style="width:100%; max-width:600px; height:auto; display:block;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Debris Class Distribution -->
+        <div class="col-span-6">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>🍩 Debris Taxonomy & Class Balance</span>
+              </div>
+              <span class="info-badge" data-explain="sdg-canvas">ℹ️</span>
+            </div>
+            <div style="width:100%; display:flex; justify-content:center;">
+              <canvas id="mlClassCanvas" width="280" height="280" style="max-width:320px; height:auto; display:block;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-cols-12" style="margin-bottom:14px;">
+        <!-- Card 3: Multi-Year Trends -->
+        <div class="col-span-7">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>📈 Global Ocean Debris Detections Trend (2020–2026)</span>
+              </div>
+              <span class="info-badge" data-explain="kpi-co2">ℹ️</span>
+            </div>
+            <div style="width:100%; overflow-x:auto;">
+              <canvas id="mlTrendCanvas" width="500" height="200" style="width:100%; max-width:600px; height:auto; display:block;"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Marine NLP Word Cloud -->
+        <div class="col-span-5">
+          <div class="sonar-card">
+            <div class="card-header">
+              <div class="card-title">
+                <span>☁️ Marine NLP Lexical Cloud</span>
+              </div>
+              <span class="info-badge" data-explain="oceanai-bot">ℹ️</span>
+            </div>
+            <div style="width:100%; display:flex; justify-content:center;">
+              <canvas id="mlWordCanvas" width="280" height="200" style="max-width:320px; height:auto; display:block;"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive NLP Marine Debris Intelligence & Query Analyzer -->
+      <div class="grid-cols-12">
+        <div class="col-span-12">
+          <div class="sonar-card" style="border-color:rgba(0,240,255,0.4);">
+            <div class="card-header">
+              <div class="card-title">
+                <span>💬 Interactive Marine NLP Query & Entity Intelligence</span>
+              </div>
+              <div style="font-size:0.72rem; color:var(--sonar-cyan); font-family:var(--font-mono);">
+                ZERO-SHOT TRANSFORMER NLP &bull; SDG 14 REASONER
+              </div>
+            </div>
+
+            <div style="padding:14px; background:#070b14; border-radius:6px; border:1px solid var(--border-subtle);">
+              <p style="font-size:0.8rem; color:#a0c4d8; margin:0 0 10px 0;">
+                Type an operator observation log, debris finding note, or acoustic anomaly report to parse entities, assess environmental severity, and calculate autonomous AUV dispatch recommendations:
+              </p>
+
+              <!-- Sample query quick-fill pills -->
+              <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px;">
+                <span style="font-size:0.72rem; color:var(--text-muted); align-self:center;">Try Samples:</span>
+                <button class="btn-sonar-secondary" style="font-size:0.7rem; padding:3px 8px;" onclick="window.mlAnalytics && window.mlAnalytics.analyzeQuery('High-density monofilament nylon ghost net cluster at 45m depth in Bay of Bengal with severe entanglement hazard')">
+                  Ghost Net at 45m (Bay of Bengal)
+                </button>
+                <button class="btn-sonar-secondary" style="font-size:0.7rem; padding:3px 8px;" onclick="window.mlAnalytics && window.mlAnalytics.analyzeQuery('Corroded 200L chemical barrel leaking toxic fluid at 92m depth near Arabian Sea shipping lane')">
+                  Chemical Drum at 92m (Arabian Sea)
+                </button>
+                <button class="btn-sonar-secondary" style="font-size:0.7rem; padding:3px 8px;" onclick="window.mlAnalytics && window.mlAnalytics.analyzeQuery('Historic wooden trawler hull colonized by thriving coral reef and fish nursery at 38m depth in Indian Ocean')">
+                  Colonized Coral Reef (Indian Ocean)
+                </button>
+                <button class="btn-sonar-secondary" style="font-size:0.7rem; padding:3px 8px;" onclick="window.mlAnalytics && window.mlAnalytics.analyzeQuery('Subsurface macroplastic polypropylene raft aggregation drifting at 15m in Pacific Garbage Patch')">
+                  Plastic Raft (Pacific GPGP)
+                </button>
+              </div>
+
+              <!-- Input row -->
+              <div style="display:flex; gap:8px;">
+                <input type="text" id="nlpQueryInput" placeholder="e.g. Sonar acoustic shadow suggests discarded monofilament fishing net at 42m depth near coral reef..." style="flex:1; background:rgba(255,255,255,0.06); border:1px solid rgba(0,240,255,0.3); border-radius:4px; padding:8px 12px; color:#ffffff; font-size:0.82rem; outline:none;" onkeydown="if(event.key==='Enter') window.mlAnalytics && window.mlAnalytics.analyzeQuery()">
+                <button class="btn-sonar-primary" onclick="window.mlAnalytics && window.mlAnalytics.analyzeQuery()">
+                  <span>⚡</span> Run NLP Inference
+                </button>
+              </div>
+
+              <!-- NLP Inference Result Box -->
+              <div id="nlpAnalysisResult"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- MODAL: OPERATOR VERIFICATION & GRAD-CAM EXPLAINABILITY -->
+  <!-- ===================================================================== -->
+  <div class="sonar-modal-overlay" id="verificationModalBackdrop" style="display:none;">
+    <div class="sonar-modal-card">
+      <div class="sonar-modal-header">
+        <div style="font-size:1.1rem; font-weight:bold; color:var(--sonar-cyan);" id="modalDetId">
+          Target Inspection & Verification
+        </div>
+        <button class="sonar-modal-close" id="btnCloseModal">&times;</button>
+      </div>
+
+      <div class="sonar-modal-body" style="padding:16px 20px;">
+        <!-- High Res Sonar Patch & GradCAM -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-bottom:4px;">Acoustic Highlight & Shadow Patch (SSS 455 kHz):</div>
+            <canvas id="modalPatchCanvas" width="300" height="150" style="width:100%; height:150px; background:#02050b; border-radius:4px; border:1px solid var(--border-glow);"></canvas>
+          </div>
+          <div style="font-size:0.75rem; font-family:var(--font-mono); color:var(--text-muted); display:flex; flex-direction:column; justify-content:space-around;">
+            <div>CATEGORY: <b style="color:#ffffff;" id="modalDetCategory">Supervised</b></div>
+            <div>CONFIDENCE: <b style="color:var(--sonar-cyan);" id="modalDetConfidence">96.4%</b></div>
+            <div>COORDINATES: <b style="color:#ffffff;" id="modalDetCoords">17.6892°N, 83.2215°E</b></div>
+            <div>DIMENSIONS: <b style="color:var(--sonar-amber);" id="modalDetGeom">Ls: 6.8m | H: 1.9m</b></div>
+            <div>CURRENT STATUS: <b style="color:var(--sonar-green);" id="modalDetStatus">Pending</b></div>
+          </div>
+        </div>
+
+        <!-- Ecological Assessment -->
+        <div style="background:#070b14; border:1px solid var(--border-subtle); padding:10px; border-radius:6px; font-size:0.75rem; margin-bottom:14px;">
+          <span style="font-weight:bold; color:var(--sonar-amber);">Ecological Assessment:</span>
+          <span id="modalDetEcological" style="color:var(--text-muted); margin-left:4px;">Threat to marine life.</span>
+        </div>
+
+        <!-- Operator Notes -->
+        <div style="margin-bottom:16px;">
+          <label style="font-size:0.75rem; color:var(--text-muted); display:block; margin-bottom:4px;">Operator Audit Log / Notes:</label>
+          <textarea id="operatorNotesInput" rows="2" style="width:100%; background:#070b14; border:1px solid var(--border-subtle); color:#fff; border-radius:4px; padding:8px; font-size:0.78rem; outline:none; resize:none;" placeholder="Enter operator observation notes..."></textarea>
+        </div>
+
+        <!-- Decision Action Buttons + Satellite Uplink -->
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <button class="btn-sonar-primary" style="background:rgba(0,240,255,0.18); border-color:var(--sonar-cyan); color:#ffffff;" onclick="window.app.uplinkSelectedTargetToSatellite()">
+            <span>🛰️</span> Uplink to Satellite (Iridium-142)
+          </button>
+
+          <div style="display:flex; gap:8px;">
+            <button class="btn-sonar-primary" style="background:var(--sonar-red); color:#fff;" onclick="window.app.verifyDetection('APPROVE')">
+              <span>🚨</span> Approve Clean-Up
+            </button>
+            <button class="btn-sonar-primary" style="background:var(--sonar-green); color:#070b14;" onclick="window.app.verifyDetection('PROTECT_HABITAT')">
+              <span>🌿</span> Preserve Habitat
+            </button>
+            <button class="btn-sonar-secondary" onclick="window.app.verifyDetection('REJECT')">
+              <span>🚫</span> Reject False Alarm
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Quick QR Scan Pill -->
+  <div id="floating-qr-pill" onclick="window.app.showQrShareModal()" title="Scan to open on phone & download app">
+    <img src="./icons/qrcode.png" style="width:26px; height:26px; background:#fff; border-radius:4px; padding:2px; box-shadow:0 0 6px rgba(0,240,255,0.4);" alt="QR">
+    <span>Scan to Get App 📱</span>
+  </div>
+
+  <!-- Persistent Mobile PWA Install Banner -->
+  <div id="pwaInstallBanner" class="pwa-install-banner" style="display:none;">
+    <div class="pwa-banner-left">
+      <img src="./icons/icon-96.png" class="pwa-banner-icon" alt="SonarX App">
+      <div>
+        <div class="pwa-banner-title">📲 Install SonarX App</div>
+        <div class="pwa-banner-desc">Add to Home Screen for fast offline & full-screen access</div>
+      </div>
+    </div>
+    <div class="pwa-banner-actions">
+      <button class="btn-pwa-install" onclick="window.app.promptPwaInstall()">Install</button>
+      <button class="btn-pwa-dismiss" onclick="document.getElementById('pwaInstallBanner').style.display='none'" title="Dismiss">✕</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
+
+  <!-- SonarX Engine Modules -->
+  <script src="./js/audio_fx.js"></script>
+  <script src="./js/sonar_renderer.js"></script>
+  <script src="./js/satellite_tracker.js"></script>
+  <script src="./js/map_module.js"></script>
+  <script src="./js/telemetry.js"></script>
+  <script src="./js/inspector.js"></script>
+  <script src="./js/ml_analytics.js"></script>
+  <script src="./js/oceanai_bot.js"></script>
+  <script src="./js/app.js"></script>
+</body>
+</html>
